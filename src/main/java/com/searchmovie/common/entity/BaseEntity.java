@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Getter
 @MappedSuperclass   //매핑정보만 상속받는 SuperClass
 @EntityListeners(AuditingEntityListener.class)
-
 public abstract class BaseEntity {
 
     @CreatedDate
