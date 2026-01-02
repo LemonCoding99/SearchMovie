@@ -1,7 +1,7 @@
 package com.searchmovie.domain.review.entity;
 
 import com.searchmovie.common.entity.BaseEntity;
-import com.searchmovie.domain.movie.Entity.Movie;
+import com.searchmovie.domain.movie.entity.Movie;
 import com.searchmovie.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
