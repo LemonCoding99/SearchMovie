@@ -45,15 +45,11 @@ public class MovieService {
         }
 
         // 4) 매핑 저장
-        try {
-            List<MovieGenre> mappings = new ArrayList<>(genres.size());
-            for (Genre genre : genres) {
-                mappings.add(new MovieGenre(movie.getId(), genre.getId()));
-            }
-            movieGenreRepository.saveAll(mappings);
-        } catch (Exception e) {
-            throw new CustomException(ExceptionCode.MOVIE_CREATE_FAILED);
+        List<MovieGenre> mappings = new ArrayList<>(genres.size());
+        for (Genre genre : genres) {
+            mappings.add(new MovieGenre(movie.getId(), genre.getId()));
         }
+        movieGenreRepository.saveAll(mappings);
 
         // 5) 응답
         return MovieCreateResponse.of(movie, genres);
