@@ -3,6 +3,7 @@ package com.searchmovie.domain.review.controller;
 import com.searchmovie.common.model.CommonResponse;
 import com.searchmovie.domain.review.model.request.ReviewCreateRequest;
 import com.searchmovie.domain.review.model.response.ReviewCreateResponse;
+import com.searchmovie.domain.review.model.response.ReviewGetResponse;
 import com.searchmovie.domain.review.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +28,13 @@ public class ReviewController {
         ReviewCreateResponse result = reviewService.createReview(movieId, userId, request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success(result, "리뷰 생성 성공"));
+    }
+
+    @GetMapping("/reviews/{reviewId}")
+    public ResponseEntity<CommonResponse<ReviewGetResponse>> getReview(@PathVariable Long reviewId) {
+
+        ReviewGetResponse result = reviewService.getReview(reviewId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.success(result, "리뷰 조회 성공"));
     }
 }

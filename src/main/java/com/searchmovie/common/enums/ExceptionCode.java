@@ -20,7 +20,8 @@ public enum ExceptionCode {
 
 
     // review
-    REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 해당 영화에 리뷰를 작성했습니다.");
+    REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 해당 영화에 리뷰를 작성했습니다."),
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다.");
 
 
 
