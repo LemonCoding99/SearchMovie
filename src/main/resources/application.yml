@@ -1,17 +1,28 @@
 spring:
   application:
     name: SearchMovie
+
   config:
-    import: optional:file:.properties[.properties]
+    import: optional:file:.env[.properties]
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${DDL_AUTO:update}
+    show-sql: true
     properties:
       hibernate:
         format_sql: false
-    show-sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+  profiles:
+    active: local
+
+
+server:
+  port: 8080
+
