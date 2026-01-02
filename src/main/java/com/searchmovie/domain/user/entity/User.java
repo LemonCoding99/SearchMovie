@@ -1,6 +1,7 @@
 package com.searchmovie.domain.user.entity;
 
 import com.searchmovie.common.entity.BaseEntity;
+import com.searchmovie.domain.user.dto.request.UserUpdateRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Table(name = "users")
+@NoArgsConstructor
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +25,8 @@ public class User extends BaseEntity {
     private String email;
     @Column(nullable = false)
     private UserRole role = UserRole.USER;
+    @Column(nullable = false)
+    private boolean isDeleted = false;
 
     public User(String name, String username, String password, String email) {
         this.name = name;
@@ -31,11 +35,11 @@ public class User extends BaseEntity {
         this.email = email;
     }
 
-    public User update(User user) {
-        this.username = user.getUsername();
-        this.name = user.getName();
-        this.email = user.getEmail();
-        this.password = user.getPassword();
+    public User update(UserUpdateRequest request) {
+        this.username = request.getUsername();
+        this.name = request.getName();
+        this.email = request.getEmail();
+        this.password = request.getPassword();
         return this;
     }
 }

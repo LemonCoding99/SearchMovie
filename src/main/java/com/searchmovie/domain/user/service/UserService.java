@@ -1,10 +1,10 @@
 package com.searchmovie.domain.user.service;
 
-import com.searchmovie.domain.user.dto.request.CreateUserRequest;
-import com.searchmovie.domain.user.dto.request.UpdateUserRequest;
-import com.searchmovie.domain.user.dto.response.CreateUserResponse;
-import com.searchmovie.domain.user.dto.response.GetUserResponse;
-import com.searchmovie.domain.user.dto.response.UpdateUserResponse;
+import com.searchmovie.domain.user.dto.request.UserCreateRequest;
+import com.searchmovie.domain.user.dto.request.UserUpdateRequest;
+import com.searchmovie.domain.user.dto.response.UserCreateResponse;
+import com.searchmovie.domain.user.dto.response.UserGetResponse;
+import com.searchmovie.domain.user.dto.response.UserUpdateResponse;
 import com.searchmovie.domain.user.entity.User;
 import com.searchmovie.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,24 +16,24 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public CreateUserResponse signup(CreateUserRequest request) {
+    public UserCreateResponse signup(UserCreateRequest request) {
 
-        User user = CreateUserRequest.of(request);
+        User user = UserCreateRequest.of(request);
         User savedUser = userRepository.save(user);
-        return CreateUserResponse.from(savedUser);
+        return UserCreateResponse.from(savedUser);
     }
 
-    public GetUserResponse getUserOwn(Long userId) {
+    public UserGetResponse getUserOwn(Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow();
-        return GetUserResponse.from(user);
+        return UserGetResponse.from(user);
     }
 
-    public UpdateUserResponse updateUser(Long userId, UpdateUserRequest request) {
+    public UserUpdateResponse updateUser(Long userId, UserUpdateRequest request) {
 
         User user = userRepository.findById(userId).orElseThrow();
-        User updatedUser = user.update(user);
-        return UpdateUserResponse.from(updatedUser);
+        User updatedUser = user.update(request);
+        return UserUpdateResponse.from(updatedUser);
     }
 
     public void deleteUser(Long userId) {
