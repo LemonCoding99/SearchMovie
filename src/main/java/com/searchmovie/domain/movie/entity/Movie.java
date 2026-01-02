@@ -21,19 +21,16 @@ public class Movie extends BaseEntity {
     @Column(nullable = false, length = 255)
     private String title;
 
-    @Column(length = 255)
+    @Column(nullable = true)
     private String director;
 
     @Column(name = "release_date")
     private LocalDate releaseDate;
 
-    private Movie(String title, String director, LocalDate releaseDate) {
+    public Movie(String title, String director, LocalDate releaseDate) {
         this.title = title;
         this.director = director;
         this.releaseDate = releaseDate;
     }
 
-    public static Movie of(String title, String director, LocalDate releaseDate) {
-        return new Movie(title, director, releaseDate);
-    }
 }

@@ -24,11 +24,7 @@ public class Genre extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String name;
 
-    private Genre(String name) {
+    public Genre(String name) {
         this.name = name;
-    }
-
-    public static Genre of(String name) {
-        return new Genre(name);
     }
 }

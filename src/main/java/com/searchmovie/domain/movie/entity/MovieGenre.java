@@ -29,15 +29,9 @@ public class MovieGenre {
     @Column(name = "genre_id", nullable = false)
     private Long genreId;
 
-    private MovieGenre(Long movieId, Long genreId) {
+    public MovieGenre(Long movieId, Long genreId) {
         this.movieId = movieId;
         this.genreId = genreId;
     }
 
-    public static MovieGenre of(Long movieId, Long genreId) {
-        if (movieId == null || genreId == null) {
-            throw new IllegalArgumentException("movieId와 genreId는 필수입니다.");
-        }
-        return new MovieGenre(movieId, genreId);
-    }
 }
