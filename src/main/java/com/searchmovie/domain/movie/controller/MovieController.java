@@ -3,27 +3,32 @@ package com.searchmovie.domain.movie.controller;
 import com.searchmovie.common.model.CommonResponse;
 import com.searchmovie.domain.movie.dto.request.MovieCreateRequest;
 import com.searchmovie.domain.movie.dto.response.MovieCreateResponse;
+import com.searchmovie.domain.movie.dto.response.MovieGetResponse;
 import com.searchmovie.domain.movie.service.MovieService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/movies")
 public class MovieController {
 
     private final MovieService movieService;
 
-    @PostMapping("/movies")
+    @PostMapping
     public ResponseEntity<CommonResponse<MovieCreateResponse>> createMovie(@Valid @RequestBody MovieCreateRequest request) {
         MovieCreateResponse response =  movieService.createMovie(request);
         CommonResponse<MovieCreateResponse> commonResponse = new CommonResponse<>(true, "영화 생성 성공", response);
         return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CommonResponse<MovieGetResponse>> getMovie(@PathVariable Long id) {
+        MovieGetResponse response = movieService.getMovie(id);
+        CommonResponse<MovieGetResponse> commonResponse = new CommonResponse<>(true, "영화 조회 성공", response);
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 }

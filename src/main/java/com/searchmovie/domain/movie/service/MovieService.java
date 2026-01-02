@@ -4,6 +4,7 @@ import com.searchmovie.common.enums.ExceptionCode;
 import com.searchmovie.common.exception.CustomException;
 import com.searchmovie.domain.movie.dto.request.MovieCreateRequest;
 import com.searchmovie.domain.movie.dto.response.MovieCreateResponse;
+import com.searchmovie.domain.movie.dto.response.MovieGetResponse;
 import com.searchmovie.domain.movie.entity.Genre;
 import com.searchmovie.domain.movie.entity.Movie;
 import com.searchmovie.domain.movie.entity.MovieGenre;
@@ -62,5 +63,24 @@ public class MovieService {
 
         return genreRepository.findByName(name)
                 .orElseGet(() -> genreRepository.save(new Genre(name)));
+    }
+
+    @Transactional(readOnly = true)
+    public MovieGetResponse getMovie(Long id) {
+        Movie movie =movieRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionCode.MOVIE_NOT_FOUND));
+
+        List<MovieGenre> movieGenreList = movieGenreRepository.findAllByMovieId(id);
+
+        List<Long> genreIdList = new ArrayList<>(movieGenreList.size());
+        for (MovieGenre movieGenre : movieGenreList) {
+            genreIdList.add(movieGenre.getGenreId());
+        }
+
+        List<Genre> genres = genreIdList.isEmpty()
+                ? List.of()
+                : genreRepository.findAllById(genreIdList);
+
+        return MovieGetResponse.of(movie, genres);
     }
 }
