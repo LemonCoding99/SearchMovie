@@ -16,6 +16,8 @@ public enum ExceptionCode {
 
     // movie
     MOVIE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 영화입니다."),
+    INVALID_GENRE_NAME(HttpStatus.BAD_REQUEST, "장르 이름이 올바르지 않습니다."),
+    MOVIE_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "영화 생성에 실패했습니다."),
 
 
 
