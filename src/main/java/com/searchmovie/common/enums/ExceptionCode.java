@@ -7,20 +7,20 @@ import org.springframework.http.HttpStatus;
 public enum ExceptionCode {
 
     // 예외처리 작성 형식
-    EXCEPTION_CODE(HttpStatus.OK, "예외처리 메세지");
+    EXCEPTION_CODE(HttpStatus.OK, "예외처리 메세지"),
 
     // user
-
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다."),
 
 
 
     // movie
-
+    MOVIE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 영화입니다."),
 
 
 
     // review
-
+    REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 해당 영화에 리뷰를 작성했습니다.");
 
 
 

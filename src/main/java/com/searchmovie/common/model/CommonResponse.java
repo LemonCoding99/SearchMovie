@@ -1,5 +1,6 @@
 package com.searchmovie.common.model;
 
+import com.searchmovie.common.enums.ExceptionCode;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -17,5 +18,15 @@ public class CommonResponse<T> {
         this.message = message;
         this.data = data;
         this.timestamp = LocalDateTime.now();
+    }
+
+    // 성공시 공용 응답 객체
+    public static <T> CommonResponse<T> success(T data, String message) {
+        return new CommonResponse<>(true, message, data);
+    }
+
+    // 실패시 공용 응답 객체
+    public static <T> CommonResponse<T> fail(ExceptionCode exceptionCode) {
+        return new CommonResponse<>(false, exceptionCode.getMessage(), null);
     }
 }
