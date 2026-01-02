@@ -8,6 +8,7 @@ import com.searchmovie.domain.review.entity.Review;
 import com.searchmovie.domain.review.model.dto.ReviewDto;
 import com.searchmovie.domain.review.model.request.ReviewCreateRequest;
 import com.searchmovie.domain.review.model.response.ReviewCreateResponse;
+import com.searchmovie.domain.review.model.response.ReviewGetResponse;
 import com.searchmovie.domain.review.repository.ReviewRepository;
 import com.searchmovie.domain.user.entity.User;
 import com.searchmovie.domain.user.repository.UserRepository;
@@ -41,5 +42,14 @@ public class ReviewService {
         Review savedReview = reviewRepository.save(review);
 
         return ReviewCreateResponse.from(ReviewDto.from(savedReview));
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewGetResponse getReview(Long reviewId) {
+
+        Review foundReview = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.REVIEW_NOT_FOUND));
+
+        return ReviewGetResponse.from(ReviewDto.from(foundReview));
     }
 }
