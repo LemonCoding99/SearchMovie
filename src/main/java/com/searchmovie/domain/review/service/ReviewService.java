@@ -120,4 +120,21 @@ public class ReviewService {
 
         return ReviewGetResponse.from(ReviewDto.from(foundReview));
     }
+
+    @Transactional
+    public void deleteReview(Long reviewId, Long userId) {
+
+        // 유저 존재 검증용
+        userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.USER_NOT_FOUND));
+
+        Review foundReview = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.REVIEW_NOT_FOUND));
+
+        if (!foundReview.getUser().getId().equals(userId)) {
+            throw new CustomException(ExceptionCode.ACCESS_DENIED);
+        }
+
+        foundReview.softDelete();
+    }
 }

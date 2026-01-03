@@ -3,13 +3,14 @@ package com.searchmovie.domain.user.entity;
 import com.searchmovie.common.entity.BaseEntity;
 import com.searchmovie.domain.user.dto.request.UserUpdateRequest;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "users")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +18,7 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
     private String password;
@@ -25,8 +26,6 @@ public class User extends BaseEntity {
     private String email;
     @Column(nullable = false)
     private UserRole role = UserRole.USER;
-    @Column(nullable = false)
-    private boolean isDeleted = false;
 
     public User(String name, String username, String password, String email) {
         this.name = name;
