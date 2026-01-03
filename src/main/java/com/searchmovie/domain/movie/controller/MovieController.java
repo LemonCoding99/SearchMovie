@@ -13,22 +13,24 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/movies")
+@RequestMapping("/api")
 public class MovieController {
 
     private final MovieService movieService;
 
-    @PostMapping
+    @PostMapping("/auth/movies")
     public ResponseEntity<CommonResponse<MovieCreateResponse>> createMovie(@Valid @RequestBody MovieCreateRequest request) {
         MovieCreateResponse response =  movieService.createMovie(request);
         CommonResponse<MovieCreateResponse> commonResponse = new CommonResponse<>(true, "영화 생성 성공", response);
         return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/movies/{id}")
     public ResponseEntity<CommonResponse<MovieGetResponse>> getMovie(@PathVariable Long id) {
         MovieGetResponse response = movieService.getMovie(id);
         CommonResponse<MovieGetResponse> commonResponse = new CommonResponse<>(true, "영화 조회 성공", response);
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
+
+
 }
