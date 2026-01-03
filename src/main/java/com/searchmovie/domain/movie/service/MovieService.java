@@ -28,6 +28,7 @@ public class MovieService {
     private final MovieGenreRepository movieGenreRepository;
     private final GenreNormalizer genreNormalizer;
 
+    // 영화 생성
     @Transactional
     public MovieCreateResponse createMovie(MovieCreateRequest request) {
 
@@ -56,15 +57,18 @@ public class MovieService {
         return MovieCreateResponse.of(movie, genres);
     }
 
+    // 장르 유효성 검증
     private Genre findOrCreateGenre(String name) {
         if (name.isEmpty()) {
             throw new CustomException(ExceptionCode.INVALID_GENRE_NAME);
         }
 
+        // 있는 장르인지 확인 후 있으먼 재사용, 없으면 생성
         return genreRepository.findByName(name)
                 .orElseGet(() -> genreRepository.save(new Genre(name)));
     }
 
+    // 영화 단건 조회
     @Transactional(readOnly = true)
     public MovieGetResponse getMovie(Long id) {
         Movie movie =movieRepository.findById(id)
