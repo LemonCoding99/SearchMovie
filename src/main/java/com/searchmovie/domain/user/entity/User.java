@@ -17,7 +17,7 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
     private String password;
@@ -25,8 +25,6 @@ public class User extends BaseEntity {
     private String email;
     @Column(nullable = false)
     private UserRole role = UserRole.USER;
-    @Column(nullable = false)
-    private boolean isDeleted = false;
 
     public User(String name, String username, String password, String email) {
         this.name = name;
