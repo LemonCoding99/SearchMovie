@@ -15,14 +15,16 @@ public enum ExceptionCode {
 
 
     // movie
+    INVALID_GENRE_NAME(HttpStatus.BAD_REQUEST, "장르 이름이 올바르지 않습니다."),
+    MOVIE_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "영화 생성에 실패했습니다."),
     MOVIE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 영화입니다."),
 
 
 
     // review
     REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 해당 영화에 리뷰를 작성했습니다."),
-    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다.");
-
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다."),
+    INVALID_REVIEW_SORT(HttpStatus.BAD_REQUEST, "정렬 조건이 올바르지 않습니다. (createdAt,desc | rating,desc");
 
 
     // search
