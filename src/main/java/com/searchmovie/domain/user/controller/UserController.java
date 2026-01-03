@@ -7,6 +7,8 @@ import com.searchmovie.domain.user.dto.response.UserCreateResponse;
 import com.searchmovie.domain.user.dto.response.UserGetResponse;
 import com.searchmovie.domain.user.dto.response.UserUpdateResponse;
 import com.searchmovie.domain.user.service.UserService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +22,8 @@ public class UserController {
     private final UserService userService;
 
     // 회원 가입
-    @PostMapping("/auth/login")
-    public ResponseEntity<CommonResponse<UserCreateResponse>> signup(@RequestBody UserCreateRequest request) {
+    @PostMapping("/auth/signup")
+    public ResponseEntity<CommonResponse<UserCreateResponse>> signup(@Valid @RequestBody UserCreateRequest request) {
 
         UserCreateResponse result = userService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success(result, "회원가입이 완료되었습니다"));

@@ -3,13 +3,14 @@ package com.searchmovie.domain.user.entity;
 import com.searchmovie.common.entity.BaseEntity;
 import com.searchmovie.domain.user.dto.request.UserUpdateRequest;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "users")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
