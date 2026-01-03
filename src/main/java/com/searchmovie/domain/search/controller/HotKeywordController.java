@@ -22,6 +22,7 @@ public class HotKeywordController {
 
     private final SearchService searchService;
 
+
     /**
      * 종합 인기검색어 TOP 10
      */

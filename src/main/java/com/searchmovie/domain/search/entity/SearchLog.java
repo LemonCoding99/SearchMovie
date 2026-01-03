@@ -24,16 +24,14 @@ public class SearchLog {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "movie_id", nullable = false)
-    private Movie movie;
+    @Column(name = "movie_id", nullable = false)
+    private Long movieId;
 
     @Column(nullable = false, length = 255)
     private String keyword;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "genre_id", nullable = false)
-    private Genre genre;
+    @Column(name = "genre_id", nullable = false)
+    private Long genreId;
 
     @Column(nullable = false)
     private Long count;
@@ -41,11 +39,11 @@ public class SearchLog {
     @Column(name = "searched_at", nullable = false)
     private LocalDateTime searchedAt;
 
-    public SearchLog(User user, Movie movie, String keyword, Genre genre) {
+    public SearchLog(User user, Long movieId, String keyword, Long genreId) {
         this.user = user;
-        this.movie = movie;
+        this.movieId = movieId;
         this.keyword = keyword;
-        this.genre = genre;
+        this.genreId = genreId;
         this.count = 1L;
         this.searchedAt = LocalDateTime.now();
     }

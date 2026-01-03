@@ -2,9 +2,11 @@ package com.searchmovie;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@EnableJpaAuditing
+//@EnableJpaAuditing
 @SpringBootApplication
 public class SearchMovieApplication {
 
@@ -12,4 +14,9 @@ public class SearchMovieApplication {
         SpringApplication.run(SearchMovieApplication.class, args);
     }
 
+    @Profile("!test")
+    @Configuration
+    @EnableJpaAuditing
+    static class JpaAuditingConfig {
+    }
 }

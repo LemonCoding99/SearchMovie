@@ -19,6 +19,7 @@ public class SearchLogRepositoryImpl implements SearchLogRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+
     //월간 인기검색 조건용
     private BooleanExpression searchedBetween(LocalDateTime from, LocalDateTime to) {
         if (from == null && to == null) return null;
@@ -42,8 +43,8 @@ public class SearchLogRepositoryImpl implements SearchLogRepositoryCustom {
                         movie.releaseDate,
                         searchLog.count.sum()))
                 .from(searchLog)
-                .leftJoin(searchLog.movie, movie)
-                .leftJoin(searchLog.genre, genre)
+                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
+                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
                 .where(searchLog.keyword.isNotNull(),
                         searchLog.keyword.ne("")
                 )
@@ -80,8 +81,8 @@ public class SearchLogRepositoryImpl implements SearchLogRepositoryCustom {
                         genre.name,
                         searchLog.count.sum()))
                 .from(searchLog)
-                .leftJoin(searchLog.genre, genre)
-                .where(searchLog.genre.isNotNull())
+                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
+                .where(searchLog.genreId.isNotNull())
                 .groupBy(genre.name)
                 .orderBy(searchLog.count.sum().desc())
                 .limit(10)
@@ -111,17 +112,19 @@ public class SearchLogRepositoryImpl implements SearchLogRepositoryCustom {
                         movie.releaseDate,
                         searchLog.count.sum()))
                 .from(searchLog)
-                .leftJoin(searchLog.movie, movie)
-                .leftJoin(searchLog.genre, genre)
+                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
+                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
+//                .leftJoin(searchLog.movie, movie)
+//                .leftJoin(searchLog.genre, genre)
                 .where( searchLog.keyword.isNotNull(),
                         searchLog.keyword.ne(""),
                         searchedBetween(from, to)
                 )
                 .groupBy(searchLog.keyword,
-                        movie.id,
                         movie.title,
                         genre.name,
-                        movie.director
+                        movie.director,
+                        movie.releaseDate
                 )
                 .orderBy(searchLog.count.sum().desc())
                 .limit(10)
