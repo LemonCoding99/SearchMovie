@@ -4,7 +4,8 @@ package com.searchmovie.domain.search.service;
 import com.searchmovie.domain.search.dto.GenreKeywordResponse;
 import com.searchmovie.domain.search.dto.HotKeywordResponse;
 import com.searchmovie.domain.search.dto.PeriodKeywordResponse;
-import com.searchmovie.domain.search.repository.SearchRepository;
+import com.searchmovie.domain.search.dto.PeriodSearchResponse;
+import com.searchmovie.domain.search.repository.SearchLogRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchService {
 
-    private final SearchRepository searchRepository;
+    private final SearchLogRepository searchLogRepository;
+
     /**
      * 종합 인기검색어 TOP 10
      */
     @Transactional
     public List<HotKeywordResponse> topOverall() {
-        return searchRepository.findTopKeywords();
+        return searchLogRepository.findTopKeywords();
     }
 
 
@@ -32,7 +34,7 @@ public class SearchService {
      */
     @Transactional
     public List<GenreKeywordResponse> topGenre() {
-        return searchRepository.findTopGenres();
+        return searchLogRepository.findTopGenres();
     }
 
 
@@ -40,7 +42,8 @@ public class SearchService {
      * 월간 인기검색어 TOP 10
      */
     @Transactional
-    public List<PeriodKeywordResponse> topPeriod(Integer year, Integer month) {
+    public PeriodSearchResponse topPeriod(Integer year, Integer month) {
+
         YearMonth yearMonth = (year == null || month == null)
                 ? YearMonth.now()
                 : YearMonth.of(year, month);
@@ -48,6 +51,11 @@ public class SearchService {
         LocalDateTime from = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime to = yearMonth.plusMonths(1).atDay(1).atStartOfDay();
 
-        return searchRepository.findTopPeriod(from, to);
+        List<PeriodKeywordResponse> periodKeywords = searchLogRepository.findTopPeriod(from, to);
+
+        return new PeriodSearchResponse(
+                yearMonth.toString(),
+                periodKeywords);
     }
+
 }

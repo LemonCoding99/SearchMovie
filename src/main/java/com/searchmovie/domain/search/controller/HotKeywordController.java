@@ -1,15 +1,19 @@
 package com.searchmovie.domain.search.controller;
 
+import com.searchmovie.common.exception.SearchException;
 import com.searchmovie.common.model.CommonResponse;
 import com.searchmovie.domain.search.dto.GenreKeywordResponse;
 import com.searchmovie.domain.search.dto.HotKeywordResponse;
-import com.searchmovie.domain.search.dto.PeriodKeywordResponse;
+import com.searchmovie.domain.search.dto.PeriodSearchResponse;
 import com.searchmovie.domain.search.service.SearchService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
+
+import static com.searchmovie.common.enums.ExceptionCode.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,16 +21,16 @@ import java.util.List;
 public class HotKeywordController {
 
     private final SearchService searchService;
-    private LocalDate from;
-    private LocalDate localDate;
 
     /**
      * 종합 인기검색어 TOP 10
      */
     @GetMapping("/synthesis")
-    public CommonResponse<List<HotKeywordResponse>> synthesis() {
+    public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> synthesis() {
         List<HotKeywordResponse> response = searchService.topOverall();
-        return new CommonResponse(true, "종합 인기 검색어 조회 성공", response);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new CommonResponse<>(true, "종합 인기 검색어 조회 성공", response));
     }
 
 
@@ -34,9 +38,11 @@ public class HotKeywordController {
      * 장르별 인기검색어 TOP 10
      */
     @GetMapping("/genre")
-    public CommonResponse<List<GenreKeywordResponse>> genre() {
+    public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> genre() {
         List<GenreKeywordResponse> response = searchService.topGenre();
-        return new CommonResponse(true, "장르별 인기 검색어 조회 성공", response);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new CommonResponse<>(true, "장르별 인기 검색어 조회 성공", response));
     }
 
 
@@ -44,13 +50,19 @@ public class HotKeywordController {
      * 월간 인기검색어 TOP 10
      */
     @GetMapping("/period")
-    public CommonResponse<List<PeriodKeywordResponse>> period(@RequestParam(required = false) Integer year,
-                                                              @RequestParam(required = false) Integer month) {
-        List<PeriodKeywordResponse> response = searchService.topPeriod(year, month);
-        return new CommonResponse(true, "월간 인기 검색어 조회 성공", response);
+    public ResponseEntity<CommonResponse<PeriodSearchResponse>> period(@RequestParam(required = false) Integer year,
+                                                                       @RequestParam(required = false) Integer month) {
+        if (year != null && (year < 1900 || year > 2100)) {
+            throw new SearchException(INVALID_SEARCH_PERIOD);
+        }
+        if (month != null && (month < 1 || month > 12)) {
+            throw new SearchException(INVALID_MONTH);
+        }
+        PeriodSearchResponse response = searchService.topPeriod(year, month);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new CommonResponse<>(true, "월간 인기 검색어 조회 성공", response));
     }
 
-    /**
-     * 리뷰점수 인기검색어 TOP 10
-     */
 }

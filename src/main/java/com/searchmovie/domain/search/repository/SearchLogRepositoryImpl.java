@@ -15,7 +15,7 @@ import static com.searchmovie.domain.search.entity.QSearchLog.searchLog;
 import static com.searchmovie.domain.movie.entity.QMovie.movie;
 
 @RequiredArgsConstructor
-public class SearchRepositoryImpl implements SearchRepositoryCustom {
+public class SearchLogRepositoryImpl implements SearchLogRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -26,6 +26,7 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom {
         if (to == null) return searchLog.searchedAt.goe(from);
         return searchLog.searchedAt.goe(from).and(searchLog.searchedAt.lt(to));
     }
+
 
     /**
      * 장르별 인기검색어 TOP 10
@@ -94,8 +95,6 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom {
                 ))
                 .toList();
     }
-
-
 
 
     /**
