@@ -64,4 +64,15 @@ public class ReviewController {
 
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.success(result, "리뷰 수정 성공"));
     }
+
+    // JWT 적용 전까지 임시로 userId 적용
+    @DeleteMapping("/reviews/{reviewId}")
+    public ResponseEntity<CommonResponse<Void>> deleteReview(
+            @PathVariable Long reviewId,
+            @RequestParam Long userId) {
+
+        reviewService.deleteReview(reviewId, userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.success(null, "리뷰 삭제 성공"));
+    }
 }
