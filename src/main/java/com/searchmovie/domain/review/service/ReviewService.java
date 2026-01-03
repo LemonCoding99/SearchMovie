@@ -8,6 +8,7 @@ import com.searchmovie.domain.movie.repository.MovieRepository;
 import com.searchmovie.domain.review.entity.Review;
 import com.searchmovie.domain.review.model.dto.ReviewDto;
 import com.searchmovie.domain.review.model.request.ReviewCreateRequest;
+import com.searchmovie.domain.review.model.request.ReviewUpdateRequest;
 import com.searchmovie.domain.review.model.response.ReviewCreateResponse;
 import com.searchmovie.domain.review.model.response.ReviewGetResponse;
 import com.searchmovie.domain.review.repository.ReviewRepository;
@@ -83,5 +84,57 @@ public class ReviewService {
         Page<ReviewGetResponse> dtoPage = reviewPage.map(review -> ReviewGetResponse.from(ReviewDto.from(review)));
 
         return PageResponse.from(dtoPage);
+    }
+
+    // JWT 적용 전까지 임시로 userId 적용
+    @Transactional
+    public ReviewGetResponse updateReview(Long reviewId, Long userId, ReviewUpdateRequest request) {
+
+        // 유저 존재 검증용
+        userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.USER_NOT_FOUND));
+
+        Review foundReview = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.REVIEW_NOT_FOUND));
+
+        if (!foundReview.getUser().getId().equals(userId)) {
+            throw new CustomException(ExceptionCode.ACCESS_DENIED);
+        }
+
+        if (request.getRating() == null && request.getContent() == null) {
+            throw new CustomException(ExceptionCode.NOTHING_TO_UPDATE);
+        }
+
+        if (request.getRating() != null) {
+            foundReview.updateRating(request.getRating());
+        }
+
+        if (request.getContent() != null) {
+
+            if (request.getContent().isBlank()) {
+                throw new CustomException(ExceptionCode.INVALID_REVIEW_CONTENT);
+            }
+
+            foundReview.updateContent(request.getContent());
+        }
+
+        return ReviewGetResponse.from(ReviewDto.from(foundReview));
+    }
+
+    @Transactional
+    public void deleteReview(Long reviewId, Long userId) {
+
+        // 유저 존재 검증용
+        userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.USER_NOT_FOUND));
+
+        Review foundReview = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.REVIEW_NOT_FOUND));
+
+        if (!foundReview.getUser().getId().equals(userId)) {
+            throw new CustomException(ExceptionCode.ACCESS_DENIED);
+        }
+
+        foundReview.softDelete();
     }
 }
