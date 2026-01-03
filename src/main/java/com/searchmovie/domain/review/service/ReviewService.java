@@ -2,6 +2,7 @@ package com.searchmovie.domain.review.service;
 
 import com.searchmovie.common.enums.ExceptionCode;
 import com.searchmovie.common.exception.CustomException;
+import com.searchmovie.common.model.PageResponse;
 import com.searchmovie.domain.movie.entity.Movie;
 import com.searchmovie.domain.movie.repository.MovieRepository;
 import com.searchmovie.domain.review.entity.Review;
@@ -13,6 +14,10 @@ import com.searchmovie.domain.review.repository.ReviewRepository;
 import com.searchmovie.domain.user.entity.User;
 import com.searchmovie.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,5 +56,32 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(ExceptionCode.REVIEW_NOT_FOUND));
 
         return ReviewGetResponse.from(ReviewDto.from(foundReview));
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<ReviewGetResponse> getReviews(Long movieId, String sort, Pageable pageable) {
+
+        // 존재 검증용
+        movieRepository.findById(movieId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.MOVIE_NOT_FOUND));
+
+        String s = (sort == null || sort.isBlank()) ? "createdAt,desc" : sort;
+
+        Sort sortObj;
+        if (s.equals("createdAt,desc")) {
+            sortObj = Sort.by(Sort.Direction.DESC, "createdAt");
+        } else if (s.equals("rating,desc")) {
+            sortObj = Sort.by(Sort.Direction.DESC, "rating");
+        } else {
+            throw new CustomException(ExceptionCode.INVALID_REVIEW_SORT);
+        }
+
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortObj);
+
+        Page<Review> reviewPage = reviewRepository.findByMovie_Id(movieId, sortedPageable);
+
+        Page<ReviewGetResponse> dtoPage = reviewPage.map(review -> ReviewGetResponse.from(ReviewDto.from(review)));
+
+        return PageResponse.from(dtoPage);
     }
 }
