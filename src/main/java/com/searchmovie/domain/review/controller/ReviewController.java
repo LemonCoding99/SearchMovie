@@ -1,12 +1,15 @@
 package com.searchmovie.domain.review.controller;
 
 import com.searchmovie.common.model.CommonResponse;
+import com.searchmovie.common.model.PageResponse;
 import com.searchmovie.domain.review.model.request.ReviewCreateRequest;
 import com.searchmovie.domain.review.model.response.ReviewCreateResponse;
 import com.searchmovie.domain.review.model.response.ReviewGetResponse;
 import com.searchmovie.domain.review.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,5 +39,16 @@ public class ReviewController {
         ReviewGetResponse result = reviewService.getReview(reviewId);
 
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.success(result, "리뷰 조회 성공"));
+    }
+
+    @GetMapping("/movies/{movieId}/reviews")
+    public ResponseEntity<CommonResponse<PageResponse<ReviewGetResponse>>> getReviews(
+            @PathVariable Long movieId,
+            @RequestParam(defaultValue = "createdAt,desc") String sort,
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
+
+        PageResponse<ReviewGetResponse> result = reviewService.getReviews(movieId, sort, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.success(result, "리뷰 목록 조회 성공"));
     }
 }
