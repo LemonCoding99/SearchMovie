@@ -10,4 +10,6 @@ public interface MovieGenreRepository extends JpaRepository<MovieGenre, Long> {
     boolean existsByMovieIdAndGenreId(Long movieId, Long genreId);
 
     List<MovieGenre> findAllByMovieId(Long id);
+
+    List<MovieGenre> findAllByMovieIdIn(List<Long> movieIds);
 }
