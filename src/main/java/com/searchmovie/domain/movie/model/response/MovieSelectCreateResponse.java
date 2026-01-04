@@ -13,7 +13,6 @@ public class MovieSelectCreateResponse {
     private final Long userId;
     private final Long movieId;
     private final String keyword;
-    private final Long count;
     private final LocalDateTime searchedAt;
 
 
@@ -23,7 +22,6 @@ public class MovieSelectCreateResponse {
                 searchLog.getUser().getId(),
                 searchLog.getMovie().getId(),
                 searchLog.getKeyword(),
-                searchLog.getCount(),
                 searchLog.getSearchedAt()
         );
     }

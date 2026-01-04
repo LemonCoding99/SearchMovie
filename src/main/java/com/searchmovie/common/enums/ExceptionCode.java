@@ -29,18 +29,18 @@ public enum ExceptionCode {
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다."),
     INVALID_REVIEW_SORT(HttpStatus.BAD_REQUEST, "정렬 조건이 올바르지 않습니다. (createdAt,desc | rating,desc"),
     NOTHING_TO_UPDATE(HttpStatus.BAD_REQUEST, "수정할 평점 혹은 내용이 없습니다."),
-    INVALID_REVIEW_CONTENT(HttpStatus.NOT_FOUND, "리뷰 내용은 공백일 수 없습니다.");
+    INVALID_REVIEW_CONTENT(HttpStatus.NOT_FOUND, "리뷰 내용은 공백일 수 없습니다."),
 
 
     // search
+    SEARCH_KEYWORD_REQUIRED(HttpStatus.NO_CONTENT, "검색 키워드는 필수입니다.")
 
 
 
 
 
 
-
-
+    ;
 
     private final HttpStatus status;
     private final String message;

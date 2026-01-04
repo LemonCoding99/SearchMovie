@@ -48,7 +48,6 @@ public class SearchLog {
         this.user = user;
         this.movie = movie;
         this.keyword = keyword;
-        this.count = 1L;
         this.searchedAt = LocalDateTime.now();
     }
 }
