@@ -1,6 +1,5 @@
 package com.searchmovie.domain.search.entity;
 
-import com.searchmovie.domain.movie.entity.Genre;
 import com.searchmovie.domain.movie.entity.Movie;
 import com.searchmovie.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -20,36 +19,22 @@ public class SearchLog {
     @Column(name = "search_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-//    @Column(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "movie_id", nullable = false)
-//    @Column(name = "movie_id", nullable = false)
-    private Movie movie;
+    @Column(name = "movie_id", nullable = false)
+    private Long movieId;
 
     @Column(nullable = false, length = 255)
     private String keyword;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "genre_id", nullable = false)
-//    @Column(name = "genre_id", nullable = false)
-    private Genre genre;
-
-    @Column(nullable = false)
-    private Long count;
-
     @Column(name = "searched_at", nullable = false)
     private LocalDateTime searchedAt;
 
-    public SearchLog(User user, Movie movie, String keyword, Genre genre) {
-        this.user = user;
-        this.movie = movie;
+    public SearchLog(User user, Movie movie, String keyword) {
+        this.userId = user.getId();
+        this.movieId = movie.getId();
         this.keyword = keyword;
-        this.genre = genre;
-        this.count = 1L;
         this.searchedAt = LocalDateTime.now();
     }
 }
