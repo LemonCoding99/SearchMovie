@@ -22,6 +22,9 @@ spring:
   profiles:
     active: local
 
+  cache:
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=60s
 
 server:
   port: 8080

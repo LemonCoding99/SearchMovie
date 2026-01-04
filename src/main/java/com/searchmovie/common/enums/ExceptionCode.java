@@ -33,14 +33,14 @@ public enum ExceptionCode {
 
 
     // search
-    BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다."),
-    INVALID_SEARCH_PERIOD(HttpStatus.BAD_REQUEST, "검색 범위가 올바르지 않습니다."),
-    INVALID_MONTH(HttpStatus.BAD_REQUEST, "검색 월(month)은 1~12 사이여야 합니다."),
-    INVALID_YEAR(HttpStatus.BAD_REQUEST, "검색 연도(year)가 허용된 범위를 벗어났습니다.");
+    SEARCH_KEYWORD_REQUIRED(HttpStatus.NO_CONTENT, "검색 키워드는 필수입니다.")
 
 
 
+
+
+
+    ;
 
     private final HttpStatus status;
     private final String message;
