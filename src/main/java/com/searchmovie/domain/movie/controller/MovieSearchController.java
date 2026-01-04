@@ -19,9 +19,9 @@ public class MovieSearchController {
 
     private final MovieSearchService movieSearchService;
 
-    // 영화 전체 검색 Api
-    @GetMapping("/v2/movies/search")
-    public ResponseEntity<CommonResponse<SimplePageResponse<MovieSearchResponse>>> searchMovieApi(
+    // 영화 전체 검색 Api(캐시 사용하지 않은 버전)
+    @GetMapping("/v1/movies/search")
+    public ResponseEntity<CommonResponse<SimplePageResponse<MovieSearchResponse>>> searchMovie1Api(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String director,
             @RequestParam(required = false) String genreKeyword,
@@ -30,17 +30,32 @@ public class MovieSearchController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        SimplePageResponse<MovieSearchResponse> response = movieSearchService.searchMovie(title, director, genreKeyword, releaseDateStart, releaseDateEnd, page, size);
+        SimplePageResponse<MovieSearchResponse> response = movieSearchService.searchMovie1(title, director, genreKeyword, releaseDateStart, releaseDateEnd, page, size);
 
         return ResponseEntity.ok(CommonResponse.success(response, "success"));
     }
 
+    // 영화 전체 검색 Api
+    @GetMapping("/v2/movies/search")
+    public ResponseEntity<CommonResponse<SimplePageResponse<MovieSearchResponse>>> searchMovie2Api(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String director,
+            @RequestParam(required = false) String genreKeyword,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate releaseDateStart,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate releaseDateEnd,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        SimplePageResponse<MovieSearchResponse> response = movieSearchService.searchMovie2(title, director, genreKeyword, releaseDateStart, releaseDateEnd, page, size);
+
+        return ResponseEntity.ok(CommonResponse.success(response, "success"));
+    }
 
     // 사용자가 검색 결과를 바탕으로 선택한 영화를 로그로 저장하는 Api
-    @PostMapping("/movies/{userId}/{movieId}/select")
+    @PostMapping("/movies/{movieId}/select")
     public ResponseEntity<CommonResponse<MovieSelectCreateResponse>> createSelectApi(
             @RequestParam String keyword,
-            @PathVariable Long userId,
+            @RequestParam Long userId,  // SpringSecurity 추가 후 @AuthenticationPrincipal로 변경하기➕
             @PathVariable Long movieId
     ) {
         MovieSelectCreateResponse response = movieSearchService.createSelect(keyword, userId, movieId);

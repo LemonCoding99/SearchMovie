@@ -24,18 +24,18 @@ public enum ExceptionCode {
     // review
     REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 해당 영화에 리뷰를 작성했습니다."),
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다."),
-    INVALID_REVIEW_SORT(HttpStatus.BAD_REQUEST, "정렬 조건이 올바르지 않습니다. (createdAt,desc | rating,desc");
+    INVALID_REVIEW_SORT(HttpStatus.BAD_REQUEST, "정렬 조건이 올바르지 않습니다. (createdAt,desc | rating,desc"),
 
 
     // search
+    SEARCH_KEYWORD_REQUIRED(HttpStatus.NO_CONTENT, "검색 키워드는 필수입니다.")
 
 
 
 
 
 
-
-
+    ;
 
     private final HttpStatus status;
     private final String message;
