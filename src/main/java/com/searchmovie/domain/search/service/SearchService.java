@@ -1,10 +1,9 @@
 package com.searchmovie.domain.search.service;
 
-
-import com.searchmovie.domain.search.dto.GenreKeywordResponse;
-import com.searchmovie.domain.search.dto.HotKeywordResponse;
-import com.searchmovie.domain.search.dto.PeriodKeywordResponse;
-import com.searchmovie.domain.search.dto.PeriodSearchResponse;
+import com.searchmovie.domain.search.model.GenreKeywordResponse;
+import com.searchmovie.domain.search.model.HotKeywordResponse;
+import com.searchmovie.domain.search.model.PeriodKeywordResponse;
+import com.searchmovie.domain.search.model.PeriodSearchResponse;
 import com.searchmovie.domain.search.repository.SearchRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ public class SearchService {
      */
     @Transactional
     public List<HotKeywordResponse> topOverall() {
-//        return null;
         return searchRepository.findTopKeywords();
     }
 
@@ -35,7 +33,6 @@ public class SearchService {
      */
     @Transactional
     public List<GenreKeywordResponse> topGenre() {
-//        return null;
         return searchRepository.findTopGenres();
     }
 
@@ -54,7 +51,7 @@ public class SearchService {
         LocalDateTime to = yearMonth.plusMonths(1).atDay(1).atStartOfDay();
 
         List<PeriodKeywordResponse> periodKeywords = searchRepository.findTopPeriod(from, to);
-//        return null;
+
         return new PeriodSearchResponse(
                 yearMonth.toString(),
                 periodKeywords);
