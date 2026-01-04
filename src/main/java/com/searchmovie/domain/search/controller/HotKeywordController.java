@@ -21,18 +21,18 @@ import static com.searchmovie.common.enums.ExceptionCode.INVALID_SEARCH_PERIOD;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/movies/hot-keywords")
+@RequestMapping("/api")
 public class HotKeywordController {
 
     private final SearchService searchService;
 
 
     /**
-     * 종합 인기검색어 TOP 10
+     * 종합 인기검색어 TOP 10 (V1 - 캐시)
      */
-    @GetMapping("/synthesis")
-    public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> synthesis() {
-        List<HotKeywordResponse> response = searchService.topOverall();
+    @GetMapping("/v1/movies/hot-keywords/synthesis")
+    public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> v1synthesis() {
+        List<HotKeywordResponse> response = searchService.v1topOverall();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "종합 인기 검색어 조회 성공", response));
@@ -40,11 +40,11 @@ public class HotKeywordController {
 
 
     /**
-     * 장르별 인기검색어 TOP 10
+     * 장르별 인기검색어 TOP 10 (V1 - 캐시)
      */
-    @GetMapping("/genre")
-    public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> genre() {
-        List<GenreKeywordResponse> response = searchService.topGenre();
+    @GetMapping("/v1/movies/hot-keywords/genre")
+    public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> v1genre() {
+        List<GenreKeywordResponse> response = searchService.v1topGenre();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "장르별 인기 검색어 조회 성공", response));
@@ -52,10 +52,10 @@ public class HotKeywordController {
 
 
     /**
-     * 월간 인기검색어 TOP 10
+     * 월간 인기검색어 TOP 10 (V1 - 캐시)
      */
-    @GetMapping("/period")
-    public ResponseEntity<CommonResponse<PeriodSearchResponse>> period(@RequestParam(required = false) Integer year,
+    @GetMapping("/v1/movies/hot-keywords/period")
+    public ResponseEntity<CommonResponse<PeriodSearchResponse>> v1period(@RequestParam(required = false) Integer year,
                                                                        @RequestParam(required = false) Integer month) {
         if (year != null && (year < 1900 || year > 2100)) {
             throw new SearchException(INVALID_SEARCH_PERIOD);
@@ -63,7 +63,58 @@ public class HotKeywordController {
         if (month != null && (month < 1 || month > 12)) {
             throw new SearchException(INVALID_MONTH);
         }
-        PeriodSearchResponse response = searchService.topPeriod(year, month);
+
+        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(year, month);
+        PeriodSearchResponse response = searchService.v1topPeriod(periodSearchRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new CommonResponse<>(true, "월간 인기 검색어 조회 성공", response));
+    }
+
+
+    // ==================================================
+    // V2 (캐시 적용)
+    // ==================================================
+
+
+    /**
+     * 종합 인기검색어 TOP 10 (V2 - 캐시)
+     */
+    @GetMapping("/v2/movies/hot-keywords/synthesis")
+    public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> v2synthesis() {
+        List<HotKeywordResponse> response = searchService.v2topSynthesis();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new CommonResponse<>(true, "종합 인기 검색어 조회 성공", response));
+    }
+
+    /**
+     * 장르별 인기검색어 TOP 10 (V2 - 캐시)
+     */
+    @GetMapping("/v2/movies/hot-keywords/genre")
+    public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> v2genre() {
+        List<GenreKeywordResponse> response = searchService.v2topGenre();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new CommonResponse<>(true, "장르별 인기 검색어 조회 성공", response));
+    }
+
+    /**
+     * 월간 인기검색어 TOP 10 (V2 - 캐시)
+     */
+    @GetMapping("/v2/movies/hot-keywords/period")
+    public ResponseEntity<CommonResponse<PeriodSearchResponse>> v2period(@RequestParam(required = false) Integer year,
+                                                                         @RequestParam(required = false) Integer month) {
+        if (year != null && (year < 1900 || year > 2100)) {
+            throw new SearchException(INVALID_SEARCH_PERIOD);
+        }
+        if (month != null && (month < 1 || month > 12)) {
+            throw new SearchException(INVALID_MONTH);
+        }
+
+        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(year, month);
+        PeriodSearchResponse response = searchService.v2topPeriod(periodSearchRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

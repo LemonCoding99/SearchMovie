@@ -48,7 +48,7 @@ class HotKeywordControllerTest {
                 new HotKeywordResponse(2, "라푼젤", "긴생머리 그녀", "호러", "순관 정",
                         LocalDate.of(2010, 7, 16), 11L)
         );
-        given(searchService.topOverall()).willReturn(serviceResponse);
+        given(searchService.v1topOverall()).willReturn(serviceResponse);
 
         mockMvc.perform(get("/api/v1/movies/hot-keywords/synthesis"))
                 .andExpect(status().isOk())
@@ -64,6 +64,8 @@ class HotKeywordControllerTest {
     @Test
     @DisplayName("월간 인기 검색어 TOP 10 조회")
     void testPeriod() throws Exception {
+
+        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(2025, 01);
         PeriodSearchResponse serviceResponse = new PeriodSearchResponse(
                 "2025-01",
                 List.of(
@@ -73,7 +75,8 @@ class HotKeywordControllerTest {
                                 LocalDate.of(2010, 7, 16), 11L)
                 )
         );
-        given(searchService.topPeriod(2025, 1)).willReturn(serviceResponse);
+
+        given(searchService.v1topPeriod(periodSearchRequest)).willReturn(serviceResponse);
 
         mockMvc.perform(get("/api/v1/movies/hot-keywords/period")
                         .param("year", "2025")
@@ -89,7 +92,9 @@ class HotKeywordControllerTest {
     @Test
     @DisplayName("월간 인기 검색어 - month 범위가 잘못되면 400")
     void testPeriod_invalidMonth_400() throws Exception {
-        given(searchService.topPeriod(2025, 13))
+
+        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(2025, 01);
+        given(searchService.v1topPeriod(periodSearchRequest))
                 .willThrow(new IllegalArgumentException("검색 월(month)은 1~12 사이여야 합니다."));
 
         mockMvc.perform(get("/api/v1/movies/hot-keywords/period")
