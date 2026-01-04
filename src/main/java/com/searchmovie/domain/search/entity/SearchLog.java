@@ -21,7 +21,7 @@ public class SearchLog {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
 //    @Column(name = "user_id", nullable = false)
     private User user;
 
@@ -34,7 +34,7 @@ public class SearchLog {
     private String keyword;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "genre_id", nullable = false)
+    @JoinColumn(name = "genre_id")
 //    @Column(name = "genre_id", nullable = false)
     private Genre genre;
 
@@ -44,11 +44,10 @@ public class SearchLog {
     @Column(name = "searched_at", nullable = false)
     private LocalDateTime searchedAt;
 
-    public SearchLog(User user, Movie movie, String keyword, Genre genre) {
+    public SearchLog(User user, Movie movie, String keyword) {
         this.user = user;
         this.movie = movie;
         this.keyword = keyword;
-        this.genre = genre;
         this.count = 1L;
         this.searchedAt = LocalDateTime.now();
     }
