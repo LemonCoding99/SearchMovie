@@ -2,8 +2,9 @@ package com.searchmovie.domain.search.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.searchmovie.domain.search.dto.*;
+import com.searchmovie.domain.search.model.*;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -11,14 +12,14 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static com.searchmovie.domain.movie.entity.QGenre.genre;
-import static com.searchmovie.domain.search.entity.QSearchLog.searchLog;
 import static com.searchmovie.domain.movie.entity.QMovie.movie;
+import static com.searchmovie.domain.movie.entity.QMovieGenre.movieGenre;
+import static com.searchmovie.domain.search.entity.QSearchLog.searchLog;
 
 @RequiredArgsConstructor
 public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
-
 
     //월간 인기검색 조건용
     private BooleanExpression searchedBetween(LocalDateTime from, LocalDateTime to) {
@@ -34,28 +35,33 @@ public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
      */
     @Override
     public List<HotKeywordResponse> findTopKeywords() {
+
+        NumberExpression<Long> score = searchLog.id.count();
+
         List<SearchKeywordResponse> rows = queryFactory
-                .select(Projections.constructor(SearchKeywordResponse.class,
+                .select(Projections.constructor(
+                        SearchKeywordResponse.class,
                         searchLog.keyword,
                         movie.title,
                         genre.name,
                         movie.director,
                         movie.releaseDate,
-                        searchLog.count.sum()))
+                        score
+                ))
                 .from(searchLog)
-                .leftJoin(searchLog.movie, movie)
-                .leftJoin(searchLog.genre, genre)
-//                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
+//                .leftJoin(searchLog.movie, movie)
+                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
+                .leftJoin(movieGenre).on(movieGenre.movieId.eq(movie.id))
+                .leftJoin(genre).on(genre.id.eq(movieGenre.genreId))
 //                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
                 .where(searchLog.keyword.isNotNull(),
-                        searchLog.keyword.ne("")
-                )
+                        searchLog.keyword.ne(""))
                 .groupBy(searchLog.keyword,
                         movie.title,
                         genre.name,
                         movie.director,
                         movie.releaseDate)
-                .orderBy(searchLog.count.sum().desc())
+                .orderBy(score.desc())
                 .limit(10)
                 .fetch();
 
@@ -78,17 +84,24 @@ public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
      */
     @Override
     public List<GenreKeywordResponse> findTopGenres() {
+
+        NumberExpression<Long> score = searchLog.id.count();
+
         List<SearchGenresResponse> rows = queryFactory
-                .select(Projections.constructor(SearchGenresResponse.class,
+                .select(Projections.constructor(
+                        SearchGenresResponse.class,
                         genre.name,
-                        searchLog.count.sum()))
+                        score
+                ))
                 .from(searchLog)
-                .leftJoin(searchLog.genre, genre)
+                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
+                .leftJoin(movieGenre).on(movieGenre.movieId.eq(movie.id))
+                .leftJoin(genre).on(genre.id.eq(movieGenre.genreId))
 //                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
 //                .where(searchLog.genreId.isNotNull())
-                .where(searchLog.genre.isNotNull())
+//                .where(searchLog.genre.isNotNull())
                 .groupBy(genre.name)
-                .orderBy(searchLog.count.sum().desc())
+                .orderBy(score.desc())
                 .limit(10)
                 .fetch();
 
@@ -107,20 +120,26 @@ public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
      */
     @Override
     public List<PeriodKeywordResponse> findTopPeriod(LocalDateTime from, LocalDateTime to) {
+
+        NumberExpression<Long> score = searchLog.id.count();
+
         List<SearchPeriodResponse> rows = queryFactory
-                .select(Projections.constructor(SearchPeriodResponse.class,
+                .select(Projections.constructor(
+                        SearchPeriodResponse.class,
                         searchLog.keyword,
                         movie.title,
                         genre.name,
                         movie.director,
                         movie.releaseDate,
-                        searchLog.count.sum()))
+                        score
+                ))
                 .from(searchLog)
-//                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
-//                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
-                .leftJoin(searchLog.movie, movie)
-                .leftJoin(searchLog.genre, genre)
-                .where( searchLog.keyword.isNotNull(),
+                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
+                .leftJoin(movieGenre).on(movieGenre.movieId.eq(movie.id))
+                .leftJoin(genre).on(genre.id.eq(movieGenre.genreId))
+//                .leftJoin(searchLog.movie, movie)
+//                .leftJoin(searchLog.genre, genre)
+                .where(searchLog.keyword.isNotNull(),
                         searchLog.keyword.ne(""),
                         searchedBetween(from, to)
                 )
@@ -130,7 +149,7 @@ public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
                         movie.director,
                         movie.releaseDate
                 )
-                .orderBy(searchLog.count.sum().desc())
+                .orderBy(score.desc())
                 .limit(10)
                 .fetch();
 

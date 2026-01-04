@@ -2,9 +2,9 @@ package com.searchmovie.domain.search.controller;
 
 import com.searchmovie.common.exception.SearchException;
 import com.searchmovie.common.model.CommonResponse;
-import com.searchmovie.domain.search.dto.GenreKeywordResponse;
-import com.searchmovie.domain.search.dto.HotKeywordResponse;
-import com.searchmovie.domain.search.dto.PeriodSearchResponse;
+import com.searchmovie.domain.search.model.GenreKeywordResponse;
+import com.searchmovie.domain.search.model.HotKeywordResponse;
+import com.searchmovie.domain.search.model.PeriodSearchResponse;
 import com.searchmovie.domain.search.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.searchmovie.common.enums.ExceptionCode.*;
+import static com.searchmovie.common.enums.ExceptionCode.INVALID_MONTH;
+import static com.searchmovie.common.enums.ExceptionCode.INVALID_SEARCH_PERIOD;
 
 @RestController
 @RequiredArgsConstructor

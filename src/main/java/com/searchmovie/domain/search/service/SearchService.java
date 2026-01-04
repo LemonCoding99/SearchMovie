@@ -1,10 +1,10 @@
 package com.searchmovie.domain.search.service;
 
 
-import com.searchmovie.domain.search.dto.GenreKeywordResponse;
-import com.searchmovie.domain.search.dto.HotKeywordResponse;
-import com.searchmovie.domain.search.dto.PeriodKeywordResponse;
-import com.searchmovie.domain.search.dto.PeriodSearchResponse;
+import com.searchmovie.domain.search.model.GenreKeywordResponse;
+import com.searchmovie.domain.search.model.HotKeywordResponse;
+import com.searchmovie.domain.search.model.PeriodKeywordResponse;
+import com.searchmovie.domain.search.model.PeriodSearchResponse;
 import com.searchmovie.domain.search.repository.SearchRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

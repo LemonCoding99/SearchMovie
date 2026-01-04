@@ -19,8 +19,10 @@ public class MovieSelectCreateResponse {
     public static MovieSelectCreateResponse from(SearchLog searchLog) {
         return new MovieSelectCreateResponse(
                 searchLog.getId(),
-                searchLog.getUser().getId(),
-                searchLog.getMovie().getId(),
+                searchLog.getUserId(),
+                searchLog.getMovieId(),
+//                searchLog.getUser().getId(),
+//                searchLog.getMovie().getId(),
                 searchLog.getKeyword(),
                 searchLog.getSearchedAt()
         );

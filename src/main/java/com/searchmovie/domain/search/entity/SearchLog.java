@@ -20,33 +20,33 @@ public class SearchLog {
     @Column(name = "search_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-//    @Column(name = "user_id", nullable = false)
-    private User user;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id")
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "movie_id", nullable = false)
-//    @Column(name = "movie_id", nullable = false)
-    private Movie movie;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "movie_id", nullable = false)
+    @Column(name = "movie_id", nullable = false)
+    private Long movieId;
 
     @Column(nullable = false, length = 255)
     private String keyword;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "genre_id")
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "genre_id")
 //    @Column(name = "genre_id", nullable = false)
-    private Genre genre;
+//    private Long genre;
 
-    @Column(nullable = false)
-    private Long count;
+//    @Column(nullable = false)
+//    private Long count;
 
     @Column(name = "searched_at", nullable = false)
     private LocalDateTime searchedAt;
 
     public SearchLog(User user, Movie movie, String keyword) {
-        this.user = user;
-        this.movie = movie;
+        this.userId = user.getId();
+        this.movieId = movie.getId();
         this.keyword = keyword;
         this.searchedAt = LocalDateTime.now();
     }
