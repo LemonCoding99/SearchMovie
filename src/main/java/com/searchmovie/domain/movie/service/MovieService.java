@@ -4,6 +4,7 @@ import com.searchmovie.common.enums.ExceptionCode;
 import com.searchmovie.common.exception.CustomException;
 import com.searchmovie.common.model.PageResponse;
 import com.searchmovie.domain.movie.dto.request.MovieCreateRequest;
+import com.searchmovie.domain.movie.dto.request.MovieUpdateRequest;
 import com.searchmovie.domain.movie.dto.response.MovieCreateResponse;
 import com.searchmovie.domain.movie.dto.response.MovieGetResponse;
 import com.searchmovie.domain.movie.entity.Genre;
@@ -73,7 +74,7 @@ public class MovieService {
     // 영화 단건 조회
     @Transactional(readOnly = true)
     public MovieGetResponse getMovie(Long id) {
-        Movie movie =movieRepository.findById(id)
+        Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionCode.MOVIE_NOT_FOUND));
 
         List<MovieGenre> movieGenreList = movieGenreRepository.findAllByMovieId(id);
@@ -139,5 +140,69 @@ public class MovieService {
         });
 
         return PageResponse.from(dtoPage);
+    }
+
+    @Transactional
+    public MovieGetResponse updateMovie(Long id, MovieUpdateRequest request) {
+
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionCode.MOVIE_NOT_FOUND));
+
+        String title = request.getTitle();
+        if (title != null) {
+            if (title.isBlank()) throw new CustomException(ExceptionCode.INVALID_MOVIE_TITLE);
+            title = title.trim();
+        }
+
+        String director = request.getDirector();
+        if (director != null) {
+            if (director.isBlank()) throw new CustomException(ExceptionCode.INVALID_MOVIE_DIRECTOR);
+            director = director.trim();
+        }
+
+        movie.update(title, director, request.getReleaseDate());
+
+        List<String> rawGenres = request.getGenres();
+        List<Genre> resultGenres;
+
+        if (rawGenres == null) {
+            List<MovieGenre> movieGenreList = movieGenreRepository.findAllByMovieId(id);
+
+            List<Long> genreIdList = new ArrayList<>(movieGenreList.size());
+            for (MovieGenre mg : movieGenreList) {
+                genreIdList.add(mg.getGenreId());
+            }
+
+            resultGenres = genreIdList.isEmpty()
+                    ? List.of()
+                    : genreRepository.findAllById(genreIdList);
+
+        } else {
+            List<String> normalized = genreNormalizer.normalize(rawGenres);
+
+            if (!rawGenres.isEmpty() && normalized.isEmpty()) {
+                throw new CustomException(ExceptionCode.INVALID_GENRE_NAME);
+            }
+
+            List<Genre> genres = new ArrayList<>(normalized.size());
+            for (String name : normalized) {
+                if (name == null || name.isBlank()) {
+                    throw new CustomException(ExceptionCode.INVALID_GENRE_NAME);
+                }
+                genres.add(findOrCreateGenre(name));
+            }
+
+            movieGenreRepository.deleteAllByMovieId(id);
+
+            List<MovieGenre> mappings = new ArrayList<>(genres.size());
+            for (Genre genre : genres) {
+                mappings.add(new MovieGenre(id, genre.getId()));
+            }
+            movieGenreRepository.saveAll(mappings);
+
+            resultGenres = genres;
+        }
+
+        return MovieGetResponse.of(movie, resultGenres);
     }
 }

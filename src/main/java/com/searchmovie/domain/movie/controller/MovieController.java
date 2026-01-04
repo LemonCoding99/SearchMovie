@@ -3,6 +3,7 @@ package com.searchmovie.domain.movie.controller;
 import com.searchmovie.common.model.CommonResponse;
 import com.searchmovie.common.model.PageResponse;
 import com.searchmovie.domain.movie.dto.request.MovieCreateRequest;
+import com.searchmovie.domain.movie.dto.request.MovieUpdateRequest;
 import com.searchmovie.domain.movie.dto.response.MovieCreateResponse;
 import com.searchmovie.domain.movie.dto.response.MovieGetResponse;
 import com.searchmovie.domain.movie.service.MovieService;
@@ -40,6 +41,12 @@ public class MovieController {
         CommonResponse<PageResponse<MovieGetResponse>> commonResponse = new CommonResponse<>(true, "영화 전체 조회 성공", response);
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
-
-
+    @PutMapping("/auth/movies/{id}")
+    public ResponseEntity<CommonResponse<MovieGetResponse>> updateMovie(
+            @PathVariable Long id,
+            @RequestBody MovieUpdateRequest request
+    ) {
+        MovieGetResponse response = movieService.updateMovie(id, request);
+        return ResponseEntity.ok(new CommonResponse<>(true, "영화 수정 성공", response));
+    }
 }
