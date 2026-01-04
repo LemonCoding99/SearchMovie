@@ -5,7 +5,7 @@ import com.searchmovie.domain.search.dto.GenreKeywordResponse;
 import com.searchmovie.domain.search.dto.HotKeywordResponse;
 import com.searchmovie.domain.search.dto.PeriodKeywordResponse;
 import com.searchmovie.domain.search.dto.PeriodSearchResponse;
-import com.searchmovie.domain.search.repository.SearchLogRepository;
+import com.searchmovie.domain.search.repository.SearchRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,14 +18,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchService {
 
-    private final SearchLogRepository searchLogRepository;
+    private final SearchRepository searchRepository;
 
     /**
      * 종합 인기검색어 TOP 10
      */
     @Transactional
     public List<HotKeywordResponse> topOverall() {
-        return searchLogRepository.findTopKeywords();
+//        return null;
+        return searchRepository.findTopKeywords();
     }
 
 
@@ -34,7 +35,8 @@ public class SearchService {
      */
     @Transactional
     public List<GenreKeywordResponse> topGenre() {
-        return searchLogRepository.findTopGenres();
+//        return null;
+        return searchRepository.findTopGenres();
     }
 
 
@@ -51,8 +53,8 @@ public class SearchService {
         LocalDateTime from = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime to = yearMonth.plusMonths(1).atDay(1).atStartOfDay();
 
-        List<PeriodKeywordResponse> periodKeywords = searchLogRepository.findTopPeriod(from, to);
-
+        List<PeriodKeywordResponse> periodKeywords = searchRepository.findTopPeriod(from, to);
+//        return null;
         return new PeriodSearchResponse(
                 yearMonth.toString(),
                 periodKeywords);

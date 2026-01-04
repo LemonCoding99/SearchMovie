@@ -15,7 +15,7 @@ import static com.searchmovie.domain.search.entity.QSearchLog.searchLog;
 import static com.searchmovie.domain.movie.entity.QMovie.movie;
 
 @RequiredArgsConstructor
-public class SearchLogRepositoryImpl implements SearchLogRepositoryCustom {
+public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -43,8 +43,10 @@ public class SearchLogRepositoryImpl implements SearchLogRepositoryCustom {
                         movie.releaseDate,
                         searchLog.count.sum()))
                 .from(searchLog)
-                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
-                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
+                .leftJoin(searchLog.movie, movie)
+                .leftJoin(searchLog.genre, genre)
+//                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
+//                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
                 .where(searchLog.keyword.isNotNull(),
                         searchLog.keyword.ne("")
                 )
@@ -81,8 +83,10 @@ public class SearchLogRepositoryImpl implements SearchLogRepositoryCustom {
                         genre.name,
                         searchLog.count.sum()))
                 .from(searchLog)
-                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
-                .where(searchLog.genreId.isNotNull())
+                .leftJoin(searchLog.genre, genre)
+//                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
+//                .where(searchLog.genreId.isNotNull())
+                .where(searchLog.genre.isNotNull())
                 .groupBy(genre.name)
                 .orderBy(searchLog.count.sum().desc())
                 .limit(10)
@@ -112,10 +116,10 @@ public class SearchLogRepositoryImpl implements SearchLogRepositoryCustom {
                         movie.releaseDate,
                         searchLog.count.sum()))
                 .from(searchLog)
-                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
-                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
-//                .leftJoin(searchLog.movie, movie)
-//                .leftJoin(searchLog.genre, genre)
+//                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
+//                .leftJoin(genre).on(genre.id.eq(searchLog.genreId))
+                .leftJoin(searchLog.movie, movie)
+                .leftJoin(searchLog.genre, genre)
                 .where( searchLog.keyword.isNotNull(),
                         searchLog.keyword.ne(""),
                         searchedBetween(from, to)
