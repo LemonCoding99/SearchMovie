@@ -49,4 +49,10 @@ public class MovieController {
         MovieGetResponse response = movieService.updateMovie(id, request);
         return ResponseEntity.ok(new CommonResponse<>(true, "영화 수정 성공", response));
     }
+
+    @DeleteMapping("/auth/movies/{id}")
+    public ResponseEntity<CommonResponse<Void>> deleteMovie(@PathVariable Long id) {
+        movieService.deleteMovie(id);
+        return ResponseEntity.ok(new CommonResponse<>(true, "영화 삭제 성공", null));
+    }
 }

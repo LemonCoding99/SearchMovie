@@ -205,4 +205,11 @@ public class MovieService {
 
         return MovieGetResponse.of(movie, resultGenres);
     }
+
+    @Transactional
+    public void deleteMovie(Long id) {
+        movieRepository.findById(id).orElseThrow(() -> new CustomException(ExceptionCode.MOVIE_NOT_FOUND));
+        movieGenreRepository.deleteAllByMovieId(id);
+        movieRepository.deleteById(id);
+    }
 }
