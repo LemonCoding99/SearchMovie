@@ -2,10 +2,10 @@ package com.searchmovie.domain.movie.controller;
 
 import com.searchmovie.common.model.CommonResponse;
 import com.searchmovie.common.model.PageResponse;
-import com.searchmovie.domain.movie.dto.request.MovieCreateRequest;
-import com.searchmovie.domain.movie.dto.request.MovieUpdateRequest;
-import com.searchmovie.domain.movie.dto.response.MovieCreateResponse;
-import com.searchmovie.domain.movie.dto.response.MovieGetResponse;
+import com.searchmovie.domain.movie.model.request.MovieCreateRequest;
+import com.searchmovie.domain.movie.model.request.MovieUpdateRequest;
+import com.searchmovie.domain.movie.model.response.MovieCreateResponse;
+import com.searchmovie.domain.movie.model.response.MovieGetResponse;
 import com.searchmovie.domain.movie.service.MovieService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
