@@ -1,4 +1,4 @@
-package com.searchmovie.domain.user.dto.response;
+package com.searchmovie.domain.user.model.response;
 
 import com.searchmovie.domain.user.entity.User;
 import com.searchmovie.domain.user.entity.UserRole;
