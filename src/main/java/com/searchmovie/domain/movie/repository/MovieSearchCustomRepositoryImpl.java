@@ -20,7 +20,7 @@ import static com.searchmovie.domain.movie.entity.QGenre.genre;
 
 
 @RequiredArgsConstructor
-public class MovieSearchCustomRepositoryImpl implements MovieSearchCustomRepository{
+public class MovieSearchCustomRepositoryImpl implements MovieSearchCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
@@ -51,7 +51,6 @@ public class MovieSearchCustomRepositoryImpl implements MovieSearchCustomReposit
                 .limit(pageable.getPageSize())
                 .fetch();
 
-
         // 전체 개수 조회(Page)
         Long totalCount = queryFactory
                 .select(movie.id.countDistinct())
@@ -68,7 +67,6 @@ public class MovieSearchCustomRepositoryImpl implements MovieSearchCustomReposit
 
         long total = totalCount != null ? totalCount : 0L;  // 조회결과 null인 경우 방지 → 0으로
 
-
         // 영화 Id 리스트로 한 번에 가져오기(장르 한 번에 가져오기 위해서)
         List<Long> movieIds = new ArrayList<>();
         for (MovieBaseResponse base : baseResponseList) {
@@ -83,7 +81,6 @@ public class MovieSearchCustomRepositoryImpl implements MovieSearchCustomReposit
             return new PageImpl<>(List.of(), pageable, total);
         }
 
-
         // 장르 조회
         List<MovieGenreResponse> genreResponseList = queryFactory
                 .select(Projections.constructor(
@@ -96,14 +93,13 @@ public class MovieSearchCustomRepositoryImpl implements MovieSearchCustomReposit
                 .where(movieGenre.movieId.in(movieIds))  // N + 1 문제 방지하기 위해 movieIds로 한 번에 조회
                 .fetch();
 
-
         // movieId 기준으로 장르 가져오기
         Map<Long, List<String>> genreMap = new HashMap<>();
         for (MovieGenreResponse genreResponse : genreResponseList) {
             Long movieId = genreResponse.getMovieId();
             String genreName = genreResponse.getGenreName();
 
-            if(movieId == null || genreName == null) continue;
+            if (movieId == null || genreName == null) continue;
 
             // movieId에 장르 할당하기
             List<String> genreList = genreMap.get(movieId);
@@ -117,7 +113,7 @@ public class MovieSearchCustomRepositoryImpl implements MovieSearchCustomReposit
 
         // 최종 ResponseDto
         List<MovieSearchResponse> results = new ArrayList<>();
-        for(MovieBaseResponse base : baseResponseList) {
+        for (MovieBaseResponse base : baseResponseList) {
             Long movieId = base.getId();
 
             List<String> genres = genreMap.get(movieId);
@@ -164,7 +160,7 @@ public class MovieSearchCustomRepositoryImpl implements MovieSearchCustomReposit
             return movie.releaseDate.after(releaseDateStart);
         if (releaseDateEnd != null)
             return movie.releaseDate.before(releaseDateEnd);
-        else{
+        else {
             return null;
         }
     }

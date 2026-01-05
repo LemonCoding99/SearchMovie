@@ -23,7 +23,7 @@ public class MovieController {
 
     @PostMapping("/auth/movies")
     public ResponseEntity<CommonResponse<MovieCreateResponse>> createMovie(@Valid @RequestBody MovieCreateRequest request) {
-        MovieCreateResponse response =  movieService.createMovie(request);
+        MovieCreateResponse response = movieService.createMovie(request);
         CommonResponse<MovieCreateResponse> commonResponse = new CommonResponse<>(true, "영화 생성 성공", response);
         return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
     }
@@ -41,6 +41,7 @@ public class MovieController {
         CommonResponse<PageResponse<MovieGetResponse>> commonResponse = new CommonResponse<>(true, "영화 전체 조회 성공", response);
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
+
     @PutMapping("/auth/movies/{id}")
     public ResponseEntity<CommonResponse<MovieGetResponse>> updateMovie(
             @PathVariable Long id,
