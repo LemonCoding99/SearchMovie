@@ -33,5 +33,4 @@ public class MovieGenre {
         this.movieId = movieId;
         this.genreId = genreId;
     }
-
 }

@@ -20,7 +20,6 @@ public class MovieGetResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-
     public MovieGetResponse(Long id, String title, String director, LocalDate releaseDate, List<String> genres, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.title = title;
@@ -31,13 +30,11 @@ public class MovieGetResponse {
         this.updatedAt = updatedAt;
     }
 
-
     public static MovieGetResponse of(Movie movie, List<Genre> genres) {
         List<String> names = new ArrayList<>(genres.size());
         for (Genre genre : genres) {
             names.add(genre.getName());
         }
-
         return new MovieGetResponse(
                 movie.getId(),
                 movie.getTitle(),
@@ -48,5 +45,4 @@ public class MovieGetResponse {
                 movie.getUpdatedAt()
         );
     }
-
 }

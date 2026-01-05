@@ -9,6 +9,4 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, MovieSearch
 
     boolean existsByTitleAndReleaseDate(String title, LocalDate releaseDate);
 
-
-
 }

@@ -15,7 +15,6 @@ public class MovieSelectCreateResponse {
     private final String keyword;
     private final LocalDateTime searchedAt;
 
-
     public static MovieSelectCreateResponse from(SearchLog searchLog) {
         return new MovieSelectCreateResponse(
                 searchLog.getId(),

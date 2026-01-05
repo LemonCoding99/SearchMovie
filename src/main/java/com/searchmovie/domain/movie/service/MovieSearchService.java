@@ -41,7 +41,6 @@ public class MovieSearchService {
         return SimplePageResponse.from(response);
     }
 
-
     // 영화 전체 검색(캐시 사용한 V2)
     @Transactional(readOnly = true)
     @Cacheable(
@@ -82,7 +81,4 @@ public class MovieSearchService {
 
         return MovieSelectCreateResponse.from(newSearchLog);
     }
-
-
-
 }
