@@ -1,4 +1,4 @@
-package com.searchmovie.domain.movie.dto.request;
+package com.searchmovie.domain.movie.model.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -1,4 +1,4 @@
-package com.searchmovie.domain.movie.dto.response;
+package com.searchmovie.domain.movie.model.response;
 
 import com.searchmovie.domain.movie.entity.Genre;
 import com.searchmovie.domain.movie.entity.Movie;

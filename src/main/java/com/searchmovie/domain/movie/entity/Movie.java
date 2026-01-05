@@ -33,4 +33,15 @@ public class Movie extends BaseEntity {
         this.releaseDate = releaseDate;
     }
 
+    public void update(String title, String director, LocalDate releaseDate) {
+        if (title != null) {
+            this.title = title;
+        }
+        if (director != null) {
+            this.director = director;
+        }
+        if (releaseDate != null) {
+            this.releaseDate = releaseDate;
+        }
+    }
 }
