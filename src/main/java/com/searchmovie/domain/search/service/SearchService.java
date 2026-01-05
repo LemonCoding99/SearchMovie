@@ -61,37 +61,72 @@ public class SearchService {
     }
 
     // =========================
-    // V2 (캐시 적용)
+    // V2 (스프링 캐시 적용)
     // =========================
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "searchMovie", key = "'overall'", sync = true)
+    @Cacheable(value = "searchMovie", key = "'v2synthesis'", sync = true)
     public List<HotKeywordResponse> v2topSynthesis() {
-        log.info("[CACHE_MISS] v2topSynthesis-> key=overall (method executed, DB will be hit)");
+        log.info("[CACHE_MISS] v2topSynthesis-> key=overall (DB hit)");
         return searchRepository.findTopKeywords();
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "searchMovie", key = "'genre'", sync = true)
+    @Cacheable(value = "searchMovie", key = "'v2genre'", sync = true)
     public List<GenreKeywordResponse> v2topGenre() {
-        log.info("[CACHE_MISS] v2topGenre -> key=genre (method executed, DB will be hit)");
+        log.info("[CACHE_MISS] v2topGenre -> genre (DB hit)");
         return searchRepository.findTopGenres();
     }
 
     @Transactional(readOnly = true)
     @Cacheable(
             value = "searchMovie",
-            key = "'period:' + #request.toYear() + '-' + #request.toMonth()",
+            key = "'v2period:' + #request.toYear() + '-' + #request.toMonth()",
             sync = true
     )
     public PeriodSearchResponse v2topPeriod(PeriodSearchRequest request) {
-        log.info("[CACHE_MISS] v2topPeriod -> key=period:{}-{} (method executed, DB will be hit)", request.toYear(), request.toMonth());
-        YearMonth yearMonth = YearMonth.of(request.getYear(), request.getMonth());
+        log.info("[CACHE_MISS] v2topPeriod -> period:{}-{} (DB hit)", request.toYear(), request.toMonth());
 
+        YearMonth yearMonth = YearMonth.of(request.getYear(), request.getMonth());
         LocalDateTime from = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime to = yearMonth.plusMonths(1).atDay(1).atStartOfDay();
 
         List<PeriodKeywordResponse> periodKeywords = searchRepository.findTopPeriod(from, to);
         return new PeriodSearchResponse(yearMonth.toString(), periodKeywords);
     }
+
+    // =========================
+    // V3 (캐시 적용)
+    // =========================
+
+//    @Transactional(readOnly = true)
+//    public List<HotKeywordResponse> v3topSynthesis() {
+//        log.info("[CACHE_MISS] v3topSynthesis-> key=overall (DB hit)");
+//        return searchRepository.findTopKeywords();
+//
+//    }
+//
+//    @Transactional(readOnly = true)
+//    @Cacheable(value = "searchMovie", key = "'v3genre'", sync = true)
+//    public List<GenreKeywordResponse> v3topGenre() {
+//        log.info("[CACHE_MISS] v2topGenre -> genre (DB hit)");
+//        return searchRepository.findTopGenres();
+//    }
+//
+//    @Transactional(readOnly = true)
+//    @Cacheable(
+//            value = "searchMovie",
+//            key = "'v3period:' + #request.toYear() + '-' + #request.toMonth()",
+//            sync = true
+//    )
+//    public PeriodSearchResponse v3topPeriod(PeriodSearchRequest request) {
+//        log.info("[CACHE_MISS] v2topPeriod -> period:{}-{} (DB hit)", request.toYear(), request.toMonth());
+//
+//        YearMonth yearMonth = YearMonth.of(request.getYear(), request.getMonth());
+//        LocalDateTime from = yearMonth.atDay(1).atStartOfDay();
+//        LocalDateTime to = yearMonth.plusMonths(1).atDay(1).atStartOfDay();
+//
+//        List<PeriodKeywordResponse> periodKeywords = searchRepository.findTopPeriod(from, to);
+//        return new PeriodSearchResponse(yearMonth.toString(), periodKeywords);
+//    }
 }
