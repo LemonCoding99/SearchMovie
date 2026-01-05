@@ -1,4 +1,4 @@
-package com.searchmovie.domain.search.model;
+package com.searchmovie.domain.search.model.response;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
