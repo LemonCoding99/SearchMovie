@@ -1,8 +1,8 @@
 package com.searchmovie.domain.search.repository;
 
-import com.searchmovie.domain.search.model.GenreKeywordResponse;
-import com.searchmovie.domain.search.model.HotKeywordResponse;
-import com.searchmovie.domain.search.model.PeriodKeywordResponse;
+import com.searchmovie.domain.search.model.response.GenreKeywordResponse;
+import com.searchmovie.domain.search.model.response.HotKeywordResponse;
+import com.searchmovie.domain.search.model.response.PeriodKeywordResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
