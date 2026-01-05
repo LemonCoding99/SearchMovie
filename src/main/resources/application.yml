@@ -25,6 +25,14 @@ spring:
   cache:
     caffeine:
       spec: maximumSize=100,expireAfterWrite=60s
+    type: redis
+    cache-names: searchMovie
+    redis:
+      time-to-live: 10m # 10분 (ms)
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 server:
   port: 8080
