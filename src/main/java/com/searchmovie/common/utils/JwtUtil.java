@@ -1,7 +1,6 @@
 package com.searchmovie.common.utils;
 
 import com.searchmovie.domain.user.entity.User;
-import com.searchmovie.domain.user.entity.UserRole;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -20,7 +19,7 @@ public class JwtUtil {
     //JWT 토큰 접두사
     private static final String BEARER_PREFIX = "Bearer ";
     // jwt 토큰 만료 시간(60분)
-    private static final long TOKEN_TIME =60 * 60 * 1000L;
+    private static final long TOKEN_TIME = 60 * 60 * 1000L;
     //jwt 서명 알고리즘
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
@@ -38,7 +37,7 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public String generateToken (User user) {
+    public String generateToken(User user) {
 
         Date date = new Date();
 
@@ -77,17 +76,6 @@ public class JwtUtil {
         }
 
         return false;   // 토큰이 유효하지 않을 시 false
-    }
-
-    // 토큰에서 아이디(username)만 뽑아내기
-    public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
-    }
-
-    // 토큰이 특정 역할을 가지고 있는지 검사
-    public boolean hasRole(String token, UserRole role) {
-        String extractedToken = extractRole(token);
-        return extractedToken.contains(role.toString());
     }
 
     // 토큰에서 내용 전부 뽑아내기

@@ -1,8 +1,8 @@
 package com.searchmovie.domain.auth.controller;
 
 import com.searchmovie.common.model.CommonResponse;
-import com.searchmovie.domain.auth.dto.LoginRequest;
-import com.searchmovie.domain.auth.dto.LoginResponse;
+import com.searchmovie.domain.auth.model.LoginRequest;
+import com.searchmovie.domain.auth.model.LoginResponse;
 import com.searchmovie.domain.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

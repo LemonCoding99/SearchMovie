@@ -33,4 +33,6 @@ public class GlobalExceptionHandler {
         CommonResponse<Void> response = new CommonResponse<>(false, ExceptionCode.INTERNAL_SERVER_ERROR.getMessage(), null);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+
+
 }
