@@ -13,9 +13,15 @@ public enum ExceptionCode {
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "해당 리소스에 대한 권한이 없습니다."),
 
     // user
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
 
-
+    // auth
+    INVALID_AUTH_INFO(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다."),
+    MISSING_REQUIRED_AUTH_FIELD(HttpStatus.BAD_REQUEST, "입력되지 않은 필드가 존재합니다."),
+    MISSING_REQUIRED_LOGIN_FIELD(HttpStatus.BAD_REQUEST, "username 또는 password가 입력되지않았습니다."),
+    REQUIRED_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
+    NOT_HAVE_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다."),
+    ALREADY_IN_USING_EMAIL(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
 
     // movie
     INVALID_GENRE_NAME(HttpStatus.BAD_REQUEST, "장르 이름이 올바르지 않습니다."),
@@ -50,7 +56,7 @@ public enum ExceptionCode {
 
 
 
-    ;
+
 
     private final HttpStatus status;
     private final String message;

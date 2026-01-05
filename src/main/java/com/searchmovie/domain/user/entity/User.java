@@ -1,16 +1,17 @@
 package com.searchmovie.domain.user.entity;
 
 import com.searchmovie.common.entity.BaseEntity;
-import com.searchmovie.domain.user.dto.request.UserUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction("deleted_at IS NULL")
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,11 +35,10 @@ public class User extends BaseEntity {
         this.email = email;
     }
 
-    public User update(UserUpdateRequest request) {
-        this.username = request.getUsername();
-        this.name = request.getName();
-        this.email = request.getEmail();
-        this.password = request.getPassword();
+    public User update(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
         return this;
     }
 }

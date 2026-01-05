@@ -1,12 +1,13 @@
 package com.searchmovie.domain.auth.service;
 
+import com.searchmovie.common.enums.ExceptionCode;
+import com.searchmovie.common.exception.CustomException;
 import com.searchmovie.common.utils.JwtUtil;
-import com.searchmovie.domain.auth.dto.LoginRequest;
-import com.searchmovie.domain.auth.dto.LoginResponse;
+import com.searchmovie.domain.auth.model.LoginRequest;
+import com.searchmovie.domain.auth.model.LoginResponse;
 import com.searchmovie.domain.user.entity.User;
 import com.searchmovie.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +22,19 @@ public class AuthService {
     // 로그인
     public LoginResponse login(LoginRequest request) {
 
-
         User user = userRepository.findUserByUsername(request.getUsername()).orElseThrow(
-                () -> new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다.")
+                () -> new CustomException(ExceptionCode.USER_NOT_FOUND)
         );
+
+        // 유저 삭제 여부 검사
+        if (user.getDeletedAt() != null) {
+            throw new CustomException(ExceptionCode.USER_NOT_FOUND);
+        }
 
         String rawPassword = request.getPassword();
 
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-            throw new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다.");
+            throw new CustomException(ExceptionCode.INVALID_AUTH_INFO);
         }
 
         String token = jwtUtil.generateToken(user);

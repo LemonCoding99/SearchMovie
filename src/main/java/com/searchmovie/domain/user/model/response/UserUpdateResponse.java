@@ -1,4 +1,4 @@
-package com.searchmovie.domain.user.dto.response;
+package com.searchmovie.domain.user.model.response;
 
 import com.searchmovie.domain.user.entity.User;
 import com.searchmovie.domain.user.entity.UserRole;
@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class UserGetResponse {
+public class UserUpdateResponse {
     private final Long id;
     private final String username;
     private final String email;
@@ -16,7 +16,7 @@ public class UserGetResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public UserGetResponse(Long id, String username, String email, String name, UserRole role, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public UserUpdateResponse(Long id, String username, String email, String name, UserRole role, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -26,15 +26,15 @@ public class UserGetResponse {
         this.updatedAt = updatedAt;
     }
 
-    public static UserGetResponse from(User user) {
-        return new UserGetResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getName(),
-                user.getRole(),
-                user.getCreatedAt(),
-                user.getUpdatedAt()
+    public static UserUpdateResponse from(User updatedUser) {
+        return new UserUpdateResponse(
+                updatedUser.getId(),
+                updatedUser.getUsername(),
+                updatedUser.getEmail(),
+                updatedUser.getName(),
+                updatedUser.getRole(),
+                updatedUser.getCreatedAt(),
+                updatedUser.getUpdatedAt()
         );
     }
 }

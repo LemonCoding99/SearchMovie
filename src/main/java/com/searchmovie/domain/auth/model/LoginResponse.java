@@ -1,4 +1,4 @@
-package com.searchmovie.domain.auth.dto;
+package com.searchmovie.domain.auth.model;
 
 import lombok.Getter;
 
