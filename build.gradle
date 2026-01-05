@@ -33,7 +33,8 @@ dependencies {
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 
     //Redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis' // Redis 추가
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310' // 파싱 도구 추가
 
     //spring-security
     implementation 'org.springframework.boot:spring-boot-starter-security'
