@@ -41,8 +41,11 @@ public enum ExceptionCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다."),
     INVALID_SEARCH_PERIOD(HttpStatus.BAD_REQUEST, "검색 범위가 올바르지 않습니다."),
     INVALID_MONTH(HttpStatus.BAD_REQUEST, "검색 월(month)은 1~12 사이여야 합니다."),
-    INVALID_YEAR(HttpStatus.BAD_REQUEST, "검색 연도(year)가 허용된 범위를 벗어났습니다.");
+    INVALID_YEAR(HttpStatus.BAD_REQUEST, "검색 연도(year)가 허용된 범위를 벗어났습니다."),
 
+
+    // coupon
+    INVALID_COUPON_USE_POLICY(HttpStatus.BAD_REQUEST, "쿠폰 사용기간 정책이 올바르지 않습니다.");
 
 
 
