@@ -1,4 +1,4 @@
-package com.searchmovie.domain.search.model;
+package com.searchmovie.domain.search.model.response;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -7,9 +7,7 @@ import java.time.LocalDate;
 
 @Getter
 @RequiredArgsConstructor
-public class HotKeywordResponse {
-
-    private final int rank;
+public class SearchKeywordResponse {
     private final String keyword;
     private final String title;
     private final String genre;

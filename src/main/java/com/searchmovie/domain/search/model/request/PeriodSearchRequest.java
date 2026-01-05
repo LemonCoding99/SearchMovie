@@ -1,4 +1,4 @@
-package com.searchmovie.domain.search.controller;
+package com.searchmovie.domain.search.model.request;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

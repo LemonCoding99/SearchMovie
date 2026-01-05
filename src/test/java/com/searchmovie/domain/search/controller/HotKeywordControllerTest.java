@@ -2,9 +2,10 @@ package com.searchmovie.domain.search.controller;
 
 import com.searchmovie.common.exception.GlobalExceptionHandler;
 import com.searchmovie.common.filter.JwtFilter;
-import com.searchmovie.domain.search.model.HotKeywordResponse;
-import com.searchmovie.domain.search.model.PeriodKeywordResponse;
-import com.searchmovie.domain.search.model.PeriodSearchResponse;
+import com.searchmovie.domain.search.model.response.HotKeywordResponse;
+import com.searchmovie.domain.search.model.response.PeriodKeywordResponse;
+import com.searchmovie.domain.search.model.request.PeriodSearchRequest;
+import com.searchmovie.domain.search.model.response.PeriodSearchResponse;
 import com.searchmovie.domain.search.service.SearchService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

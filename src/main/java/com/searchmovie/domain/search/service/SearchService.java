@@ -1,10 +1,10 @@
 package com.searchmovie.domain.search.service;
 
-import com.searchmovie.domain.search.controller.PeriodSearchRequest;
-import com.searchmovie.domain.search.model.GenreKeywordResponse;
-import com.searchmovie.domain.search.model.HotKeywordResponse;
-import com.searchmovie.domain.search.model.PeriodKeywordResponse;
-import com.searchmovie.domain.search.model.PeriodSearchResponse;
+import com.searchmovie.domain.search.model.request.PeriodSearchRequest;
+import com.searchmovie.domain.search.model.response.GenreKeywordResponse;
+import com.searchmovie.domain.search.model.response.HotKeywordResponse;
+import com.searchmovie.domain.search.model.response.PeriodKeywordResponse;
+import com.searchmovie.domain.search.model.response.PeriodSearchResponse;
 import com.searchmovie.domain.search.repository.SearchRepository;
 
 import lombok.RequiredArgsConstructor;
