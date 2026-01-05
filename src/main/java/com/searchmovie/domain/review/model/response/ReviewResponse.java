@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class ReviewGetResponse {
+public class ReviewResponse {
 
     private final Long id;
     private final Long movieId;
@@ -18,8 +18,8 @@ public class ReviewGetResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public static ReviewGetResponse from(ReviewDto dto) {
-        return new ReviewGetResponse(
+    public static ReviewResponse from(ReviewDto dto) {
+        return new ReviewResponse(
                 dto.getId(),
                 dto.getMovieId(),
                 dto.getUserId(),
