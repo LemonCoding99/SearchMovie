@@ -8,6 +8,7 @@ import com.searchmovie.domain.search.model.response.PeriodSearchResponse;
 import com.searchmovie.domain.search.repository.SearchRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SearchService {
@@ -63,24 +65,27 @@ public class SearchService {
     // =========================
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "hotKeywords", key = "'overall'", sync = true)
+    @Cacheable(value = "searchMovie", key = "'overall'", sync = true)
     public List<HotKeywordResponse> v2topSynthesis() {
+        log.info("[CACHE_MISS] v2topSynthesis-> key=overall (method executed, DB will be hit)");
         return searchRepository.findTopKeywords();
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "hotKeywords", key = "'genre'", sync = true)
+    @Cacheable(value = "searchMovie", key = "'genre'", sync = true)
     public List<GenreKeywordResponse> v2topGenre() {
+        log.info("[CACHE_MISS] v2topGenre -> key=genre (method executed, DB will be hit)");
         return searchRepository.findTopGenres();
     }
 
     @Transactional(readOnly = true)
     @Cacheable(
-            value = "hotKeywords",
+            value = "searchMovie",
             key = "'period:' + #request.toYear() + '-' + #request.toMonth()",
             sync = true
     )
     public PeriodSearchResponse v2topPeriod(PeriodSearchRequest request) {
+        log.info("[CACHE_MISS] v2topPeriod -> key=period:{}-{} (method executed, DB will be hit)", request.toYear(), request.toMonth());
         YearMonth yearMonth = YearMonth.of(request.getYear(), request.getMonth());
 
         LocalDateTime from = yearMonth.atDay(1).atStartOfDay();

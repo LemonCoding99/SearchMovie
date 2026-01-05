@@ -16,7 +16,6 @@ public class SearchLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "search_id")
     private Long id;
 
     @Column(name = "user_id")

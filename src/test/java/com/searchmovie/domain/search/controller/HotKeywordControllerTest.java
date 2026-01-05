@@ -66,7 +66,7 @@ class HotKeywordControllerTest {
     @DisplayName("월간 인기 검색어 TOP 10 조회")
     void testPeriod() throws Exception {
 
-        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(2025, 01);
+        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(2025, 1);
         PeriodSearchResponse serviceResponse = new PeriodSearchResponse(
                 "2025-01",
                 List.of(
@@ -94,7 +94,7 @@ class HotKeywordControllerTest {
     @DisplayName("월간 인기 검색어 - month 범위가 잘못되면 400")
     void testPeriod_invalidMonth_400() throws Exception {
 
-        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(2025, 01);
+        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(2025, 1);
         given(searchService.v1topPeriod(periodSearchRequest))
                 .willThrow(new IllegalArgumentException("검색 월(month)은 1~12 사이여야 합니다."));
 
