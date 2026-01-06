@@ -1,6 +1,7 @@
 package com.searchmovie.domain.coupon.entity;
 
 import com.searchmovie.common.entity.BaseEntity;
+import com.searchmovie.domain.coupon.model.request.CouponUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -62,5 +63,13 @@ public class Coupon extends BaseEntity {
         this.usePeriodDays = usePeriodDays;
         this.useStartAt = useStartAt;
         this.useEndAt = useEndAt;
+    }
+
+    public void update(String name, Integer discountRate, Integer  maxDiscountPrice, LocalDateTime issueStartAt, LocalDateTime issueEndAt, Integer usePeriodDays, LocalDateTime useStartAt, LocalDateTime useEndAt) {
+        if (name != null) this.name = name;
+        if (discountRate != null) this.discountRate = discountRate;
+        if (maxDiscountPrice != null) this.maxDiscountPrice = maxDiscountPrice;
+        if (issueStartAt != null) this.issueStartAt = issueStartAt;
+        if (issueEndAt != null) this.issueEndAt = issueEndAt;
     }
 }

@@ -1,12 +1,15 @@
 package com.searchmovie.domain.coupon.controller;
 
 import com.searchmovie.common.model.CommonResponse;
+import com.searchmovie.common.model.PageResponse;
 import com.searchmovie.domain.coupon.model.request.CouponCreateRequest;
+import com.searchmovie.domain.coupon.model.request.CouponUpdateRequest;
 import com.searchmovie.domain.coupon.model.response.CouponCreateResponse;
 import com.searchmovie.domain.coupon.model.response.CouponGetResponse;
 import com.searchmovie.domain.coupon.service.CouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +29,33 @@ public class CouponController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CommonResponse<>> getCoupon(@PathVariable Long id) {
+    public ResponseEntity<CommonResponse<CouponGetResponse>> getCoupon(@PathVariable Long id) {
         CouponGetResponse response = couponService.getCoupon(id);
         CommonResponse<CouponGetResponse> commonResponse = new CommonResponse<>(true, "쿠폰 조회 성공", response);
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
+    @GetMapping
+    public ResponseEntity<CommonResponse<PageResponse<CouponGetResponse>>> getCoupons(Pageable pageable) {
+        PageResponse<CouponGetResponse> response = couponService.getCoupons(pageable);
+        CommonResponse<PageResponse<CouponGetResponse>> commonResponse = new CommonResponse<>(true, "영화 전체 조회 성공", response);
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    }
 
+    @PutMapping("/{couponId}")
+    public ResponseEntity<CommonResponse<CouponGetResponse>> updateCoupon(
+            @PathVariable Long couponId,
+            @Valid @RequestBody CouponUpdateRequest request
+    ) {
+        CouponGetResponse response = couponService.updateCoupon(couponId, request);
+        CommonResponse<CouponGetResponse> commonResponse = new CommonResponse<>(true, "쿠폰 수정 성공", response);
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    }
+
+    @DeleteMapping("/{couponId}")
+    public ResponseEntity<CommonResponse<Void>> deleteCoupon(@PathVariable Long couponId) {
+        couponService.delete(couponId);
+        CommonResponse<Void> commonResponse = new CommonResponse<>(true, "쿠폰 삭제 성공", null);
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    }
 }
