@@ -5,6 +5,7 @@ import com.searchmovie.common.exception.CustomException;
 import com.searchmovie.domain.coupon.entity.Coupon;
 import com.searchmovie.domain.coupon.model.request.CouponCreateRequest;
 import com.searchmovie.domain.coupon.model.response.CouponCreateResponse;
+import com.searchmovie.domain.coupon.model.response.CouponGetResponse;
 import com.searchmovie.domain.coupon.repository.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class CouponService {
         Coupon coupon = new Coupon(
                 request.getName(),
                 request.getDiscountRate(),
+                request.getMaxDiscountPrice(),
                 request.getIssueStartAt(),
                 request.getIssueEndAt(),
                 request.getUsePeriodDays(),
@@ -45,5 +47,12 @@ public class CouponService {
 
         Coupon savedCoupon = couponRepository.save(coupon);
         return CouponCreateResponse.of(savedCoupon);
+    }
+
+    @Transactional(readOnly = true)
+    public CouponGetResponse getCoupon(Long id) {
+        Coupon coupon = couponRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_NOT_FOUND));
+        return CouponGetResponse.from(coupon);
     }
 }

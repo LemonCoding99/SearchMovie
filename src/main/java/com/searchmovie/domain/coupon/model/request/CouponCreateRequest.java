@@ -13,6 +13,8 @@ public class CouponCreateRequest {
 
     private Integer discountRate;
 
+    private Integer maxDiscountPrice;
+
     private LocalDateTime issueStartAt;
 
     private LocalDateTime issueEndAt;

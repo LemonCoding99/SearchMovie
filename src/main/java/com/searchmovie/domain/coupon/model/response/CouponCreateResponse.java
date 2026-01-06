@@ -16,6 +16,8 @@ public class CouponCreateResponse {
 
     private Integer discountRate;
 
+    private Integer maxDiscountPrice;
+
     private LocalDateTime issueStartAt;
 
     private LocalDateTime issueEndAt;
@@ -33,6 +35,7 @@ public class CouponCreateResponse {
                 coupon.getId(),
                 coupon.getName(),
                 coupon.getDiscountRate(),
+                coupon.getMaxDiscountPrice(),
                 coupon.getIssueStartAt(),
                 coupon.getIssueEndAt(),
                 coupon.getUsePeriodDays(),
