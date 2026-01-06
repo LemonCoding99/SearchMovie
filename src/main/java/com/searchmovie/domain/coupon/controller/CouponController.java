@@ -38,7 +38,7 @@ public class CouponController {
     @GetMapping
     public ResponseEntity<CommonResponse<PageResponse<CouponGetResponse>>> getCoupons(Pageable pageable) {
         PageResponse<CouponGetResponse> response = couponService.getCoupons(pageable);
-        CommonResponse<PageResponse<CouponGetResponse>> commonResponse = new CommonResponse<>(true, "영화 전체 조회 성공", response);
+        CommonResponse<PageResponse<CouponGetResponse>> commonResponse = new CommonResponse<>(true, "쿠폰 전체 조회 성공", response);
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
@@ -54,7 +54,7 @@ public class CouponController {
 
     @DeleteMapping("/{couponId}")
     public ResponseEntity<CommonResponse<Void>> deleteCoupon(@PathVariable Long couponId) {
-        couponService.delete(couponId);
+        couponService.deleteCoupon(couponId);
         CommonResponse<Void> commonResponse = new CommonResponse<>(true, "쿠폰 삭제 성공", null);
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }

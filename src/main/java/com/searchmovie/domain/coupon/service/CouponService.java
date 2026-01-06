@@ -80,7 +80,6 @@ public class CouponService {
     public void deleteCoupon(Long couponId) {
         Coupon coupon = couponRepository.findByIdAndDeletedAtIsNull(couponId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_NOT_FOUND));
-
         coupon.softDelete();
     }
 }

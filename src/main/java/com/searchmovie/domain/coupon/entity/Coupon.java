@@ -1,6 +1,8 @@
 package com.searchmovie.domain.coupon.entity;
 
 import com.searchmovie.common.entity.BaseEntity;
+import com.searchmovie.common.enums.ExceptionCode;
+import com.searchmovie.common.exception.CustomException;
 import com.searchmovie.domain.coupon.model.request.CouponUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -71,5 +73,52 @@ public class Coupon extends BaseEntity {
         if (maxDiscountPrice != null) this.maxDiscountPrice = maxDiscountPrice;
         if (issueStartAt != null) this.issueStartAt = issueStartAt;
         if (issueEndAt != null) this.issueEndAt = issueEndAt;
+
+        if (usePeriodDays != null || useStartAt != null || useEndAt != null) {
+            this.usePeriodDays = usePeriodDays;
+            this.useStartAt = useStartAt;
+            this.useEndAt = useEndAt;
+        }
+        validate();
+    }
+
+    // 쿠폰 정책 검증 (사용가능 기간)
+    private void validate() {
+        validateIssuePeriod();
+        validateUsePolicy();
+        validateDiscount();
+    }
+
+    private void validateIssuePeriod() {
+        if (issueStartAt.isAfter(issueEndAt)) {
+            throw new CustomException(ExceptionCode.INVALID_COUPON_ISSUE_PERIOD);
+        }
+    }
+
+    private void validateUsePolicy() {
+        boolean hasPeriodDays = usePeriodDays != null;
+        boolean hasUseAt = useStartAt != null || useEndAt != null;
+
+        // 둘 중 하나만 존재해야 함
+        if (hasPeriodDays == hasUseAt) {
+            throw new CustomException(ExceptionCode.INVALID_COUPON_USE_POLICY);
+        }
+
+        if (hasUseAt) {
+            if (useStartAt == null || useEndAt == null || useStartAt.isAfter(useEndAt)) {
+                throw new CustomException(ExceptionCode.INVALID_COUPON_USE_POLICY);
+            }
+        }
+    }
+
+    private void validateDiscount() {
+        if (discountRate < 1 || discountRate > 100) {
+            throw new CustomException(ExceptionCode.INVALID_COUPON_DISCOUNT);
+        }
+
+        // null = 제한 없음
+        if (maxDiscountPrice != null && maxDiscountPrice < 0) {
+            throw new CustomException(ExceptionCode.INVALID_COUPON_DISCOUNT);
+        }
     }
 }

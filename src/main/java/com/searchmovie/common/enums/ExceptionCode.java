@@ -52,7 +52,9 @@ public enum ExceptionCode {
 
     // coupon
     INVALID_COUPON_USE_POLICY(HttpStatus.BAD_REQUEST, "쿠폰 사용기간 정책이 올바르지 않습니다."),
-    COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다.");
+    COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),
+    INVALID_COUPON_ISSUE_PERIOD(HttpStatus.BAD_REQUEST, "쿠폰 발급 기간이 올바르지 않습니다."),
+    INVALID_COUPON_DISCOUNT(HttpStatus.BAD_REQUEST, "쿠폰 할인 정책이 올바르지 않습니다.");
 
 
 
