@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -67,6 +68,7 @@ class HotKeywordControllerTest {
     void testPeriod() throws Exception {
 
         PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(2025, 1);
+
         PeriodSearchResponse serviceResponse = new PeriodSearchResponse(
                 "2025-01",
                 List.of(
@@ -77,7 +79,8 @@ class HotKeywordControllerTest {
                 )
         );
 
-        given(searchService.v1topPeriod(periodSearchRequest)).willReturn(serviceResponse);
+        given(searchService.v1topPeriod(any(PeriodSearchRequest.class)))
+                .willReturn(serviceResponse);
 
         mockMvc.perform(get("/api/v1/movies/hot-keywords/period")
                         .param("year", "2025")
@@ -94,8 +97,7 @@ class HotKeywordControllerTest {
     @DisplayName("월간 인기 검색어 - month 범위가 잘못되면 400")
     void testPeriod_invalidMonth_400() throws Exception {
 
-        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(2025, 1);
-        given(searchService.v1topPeriod(periodSearchRequest))
+        given(searchService.v1topPeriod(any(PeriodSearchRequest.class)))
                 .willThrow(new IllegalArgumentException("검색 월(month)은 1~12 사이여야 합니다."));
 
         mockMvc.perform(get("/api/v1/movies/hot-keywords/period")
