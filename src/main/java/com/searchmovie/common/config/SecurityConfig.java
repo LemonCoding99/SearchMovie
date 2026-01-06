@@ -36,10 +36,16 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/signup").permitAll()
                         .requestMatchers("/api/movies/**").permitAll()
+                        .requestMatchers("/api/v1/movies/**").permitAll()
+                        .requestMatchers("/api/v2/movies/**").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/api/stocks/**").permitAll()
                         // User 권한만 허용
                         .requestMatchers("/api/users/**").hasAuthority(UserRole.Authority.USER)
                         // ADMIN 권한만 허용
-                        .requestMatchers(request -> request.getRequestURI().startsWith("/api/auth/movies")).hasAuthority(UserRole.Authority.ADMIN)
+                        .requestMatchers("/api/auth/movies/**").hasAuthority(UserRole.Authority.ADMIN)
+                        .requestMatchers("/api/auth/coupons/**").hasAuthority(UserRole.Authority.ADMIN)
+                        .requestMatchers("/api/auth/stocks/**").hasAuthority(UserRole.Authority.ADMIN)
                         .anyRequest().authenticated()
                 )
                 .build();
