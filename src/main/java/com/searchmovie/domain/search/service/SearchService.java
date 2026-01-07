@@ -29,7 +29,7 @@ public class SearchService {
      * 종합 인기검색어 TOP 10
      */
     @Transactional
-    public List<HotKeywordResponse> v1topOverall() {
+    public List<HotKeywordResponse> v1topSynthesis() {
         return searchRepository.findTopKeywords();
     }
 
@@ -102,12 +102,12 @@ public class SearchService {
 
     @Transactional(readOnly = true)
     public List<HotKeywordResponse> v3topSynthesis() {
-
         List<HotKeywordResponse> cached = searchCacheService.getSynthesis();
         if (cached != null) {
             return cached;
         }
-        log.info("[CACHE_MISS] v3topSynthesis-> key=overall (DB hit)");
+
+        log.info("[CACHE_MISS] v3topSynthesis -> DB hit");
         List<HotKeywordResponse> topKeywords = searchRepository.findTopKeywords();
         searchCacheService.saveSynthesis(topKeywords);
         return topKeywords;
@@ -115,11 +115,12 @@ public class SearchService {
 
     @Transactional(readOnly = true)
     public List<GenreKeywordResponse> v3topGenre() {
-        List<GenreKeywordResponse> genre = searchCacheService.getGenre();
-        if (genre != null) {
-            return genre;
+        List<GenreKeywordResponse> cached = searchCacheService.getGenre();
+        if (cached != null) {
+            return cached;
         }
-        log.info("[CACHE_MISS] v3topGenre -> genre (DB hit)");
+
+        log.info("[CACHE_MISS] v3topGenre -> DB hit");
         List<GenreKeywordResponse> topGenres = searchRepository.findTopGenres();
         searchCacheService.saveGenre(topGenres);
         return topGenres;
@@ -139,8 +140,10 @@ public class SearchService {
         LocalDateTime to = yearMonth.plusMonths(1).atDay(1).atStartOfDay();
 
         List<PeriodKeywordResponse> periodKeywords = searchRepository.findTopPeriod(from, to);
-        searchCacheService.savePeriod(request.getYear(),request.getMonth(),period);
+        PeriodSearchResponse response = new PeriodSearchResponse(yearMonth.toString(), periodKeywords);
 
-        return new PeriodSearchResponse(yearMonth.toString(), periodKeywords);
+        searchCacheService.savePeriod(request.getYear(), request.getMonth(), response);
+
+        return response;
     }
 }

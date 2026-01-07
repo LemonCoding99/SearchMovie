@@ -33,13 +33,13 @@ class SearchServiceTest {
 
     @Test
     @DisplayName("V1 종합 인기검색어 - 캐시 없이 DB에서 직접 조회한다")
-    void v1topOverall_Success() {
+    void v1TopSynthesis_Success() {
         // given
         List<HotKeywordResponse> mockResponse = List.of(new HotKeywordResponse(1, "부장들", "남산의 부장들", "드라마", "우민호", LocalDate.parse("2020-07-15"), 100L));
         given(searchRepository.findTopKeywords()).willReturn(mockResponse);
 
         // when
-        List<HotKeywordResponse> result = searchService.v1topOverall();
+        List<HotKeywordResponse> result = searchService.v1topSynthesis();
 
         // then
         assertThat(result).hasSize(1);
