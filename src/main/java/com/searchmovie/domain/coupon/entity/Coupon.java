@@ -1,6 +1,9 @@
 package com.searchmovie.domain.coupon.entity;
 
 import com.searchmovie.common.entity.BaseEntity;
+import com.searchmovie.common.enums.ExceptionCode;
+import com.searchmovie.common.exception.CustomException;
+import com.searchmovie.domain.coupon.model.request.CouponUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -29,7 +32,8 @@ public class Coupon extends BaseEntity {
     private Integer discountRate;
 
     // 최대 할인금액
-    private Integer maxDiscountRate;
+    @Column(name = "max_discount_price")
+    private Integer maxDiscountPrice;
 
     // 발급 시작 날짜
     @Column(name = "issue_start_at", nullable = false)
@@ -52,14 +56,69 @@ public class Coupon extends BaseEntity {
     @Column(name = "use_end_at")
     private LocalDateTime useEndAt;
 
-    public Coupon(String name, Integer discountRate, Integer maxDiscountRate, LocalDateTime issueStartAt, LocalDateTime issueEndAt, Integer usePeriodDays, LocalDateTime useStartAt, LocalDateTime useEndAt) {
+    public Coupon(String name, Integer discountRate, Integer  maxDiscountPrice, LocalDateTime issueStartAt, LocalDateTime issueEndAt, Integer usePeriodDays, LocalDateTime useStartAt, LocalDateTime useEndAt) {
         this.name = name;
         this.discountRate = discountRate;
-        this.maxDiscountRate = maxDiscountRate;
+        this.maxDiscountPrice = maxDiscountPrice;
         this.issueStartAt = issueStartAt;
         this.issueEndAt = issueEndAt;
         this.usePeriodDays = usePeriodDays;
         this.useStartAt = useStartAt;
         this.useEndAt = useEndAt;
+    }
+
+    public void update(String name, Integer discountRate, Integer  maxDiscountPrice, LocalDateTime issueStartAt, LocalDateTime issueEndAt, Integer usePeriodDays, LocalDateTime useStartAt, LocalDateTime useEndAt) {
+        if (name != null) this.name = name;
+        if (discountRate != null) this.discountRate = discountRate;
+        if (maxDiscountPrice != null) this.maxDiscountPrice = maxDiscountPrice;
+        if (issueStartAt != null) this.issueStartAt = issueStartAt;
+        if (issueEndAt != null) this.issueEndAt = issueEndAt;
+
+        if (usePeriodDays != null || useStartAt != null || useEndAt != null) {
+            this.usePeriodDays = usePeriodDays;
+            this.useStartAt = useStartAt;
+            this.useEndAt = useEndAt;
+        }
+        validate();
+    }
+
+    // 쿠폰 정책 검증 (사용가능 기간)
+    private void validate() {
+        validateIssuePeriod();
+        validateUsePolicy();
+        validateDiscount();
+    }
+
+    private void validateIssuePeriod() {
+        if (issueStartAt.isAfter(issueEndAt)) {
+            throw new CustomException(ExceptionCode.INVALID_COUPON_ISSUE_PERIOD);
+        }
+    }
+
+    private void validateUsePolicy() {
+        boolean hasPeriodDays = usePeriodDays != null;
+        boolean hasUseAt = useStartAt != null || useEndAt != null;
+
+        // 둘 중 하나만 존재해야 함
+        if (hasPeriodDays == hasUseAt) {
+            throw new CustomException(ExceptionCode.INVALID_COUPON_USE_POLICY);
+        }
+
+        if (hasUseAt) {
+            if (useStartAt == null || useEndAt == null || useStartAt.isAfter(useEndAt)) {
+                throw new CustomException(ExceptionCode.INVALID_COUPON_USE_POLICY);
+            }
+        }
+    }
+
+    private void validateDiscount() {
+        if (discountRate < 1 || discountRate > 100) {
+            throw new CustomException(ExceptionCode.INVALID_COUPON_DISCOUNT);
+        }
+
+        // null = 제한 없음
+        if (maxDiscountPrice != null && maxDiscountPrice < 0) {
+            throw new CustomException(ExceptionCode.INVALID_COUPON_DISCOUNT);
+        }
     }
 }
