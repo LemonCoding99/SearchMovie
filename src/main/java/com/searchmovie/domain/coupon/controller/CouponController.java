@@ -7,20 +7,23 @@ import com.searchmovie.domain.coupon.model.request.CouponUpdateRequest;
 import com.searchmovie.domain.coupon.model.response.CouponCreateResponse;
 import com.searchmovie.domain.coupon.model.response.CouponGetResponse;
 import com.searchmovie.domain.coupon.service.CouponService;
+import com.searchmovie.domain.user.entity.UserRole;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth/coupons")
+@RequestMapping("/api/coupons")
 public class CouponController {
 
     private final CouponService couponService;
 
+    @Secured(UserRole.Authority.ADMIN)
     @PostMapping
     public ResponseEntity<CommonResponse<CouponCreateResponse>> CreateCoupon(@Valid @RequestBody CouponCreateRequest request) {
         CouponCreateResponse response = couponService.CreateCoupon(request);
@@ -42,6 +45,7 @@ public class CouponController {
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
+    @Secured(UserRole.Authority.ADMIN)
     @PutMapping("/{couponId}")
     public ResponseEntity<CommonResponse<CouponGetResponse>> updateCoupon(
             @PathVariable Long couponId,
@@ -52,6 +56,7 @@ public class CouponController {
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
+    @Secured(UserRole.Authority.ADMIN)
     @DeleteMapping("/{couponId}")
     public ResponseEntity<CommonResponse<Void>> deleteCoupon(@PathVariable Long couponId) {
         couponService.deleteCoupon(couponId);
