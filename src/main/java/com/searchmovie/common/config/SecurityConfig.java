@@ -33,29 +33,29 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtFilter, SecurityContextHolderAwareRequestFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        // 권한 없어도 허용
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/signup").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
-                        .requestMatchers("/api/v1/movies/**").permitAll()
-                        .requestMatchers("/api/v2/movies/**").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/api/stocks/**").permitAll()
-                        // User 권한만 허용
-                        .requestMatchers("/api/users/**").hasAuthority(UserRole.Authority.USER)
-                        .requestMatchers("/api/coupons/*/issue/**").hasAuthority(UserRole.Authority.USER)
-                        .requestMatchers(HttpMethod.GET, "/api/coupons/**").hasAuthority(UserRole.Authority.USER)
-                        // ADMIN 권한만 허용
-                        .requestMatchers(HttpMethod.PUT, "/api/movies/**").hasAuthority(UserRole.Authority.ADMIN)
-                        .requestMatchers(HttpMethod.DELETE, "/api/movies/**").hasAuthority(UserRole.Authority.ADMIN)
-                        .requestMatchers("/api/coupons/*/stocks").hasAuthority(UserRole.Authority.ADMIN)
-                        .requestMatchers("/api/stocks/**").hasAuthority(UserRole.Authority.ADMIN)
-                        .requestMatchers("/api/users/**").hasAuthority(UserRole.Authority.ADMIN)
-                        .requestMatchers("/api/coupons/*/issue/**").hasAuthority(UserRole.Authority.ADMIN)
-                        .requestMatchers(HttpMethod.GET, "/api/coupons/**").hasAuthority(UserRole.Authority.ADMIN)
-                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+                                // 권한 없어도 허용
+                                .requestMatchers("/api/auth/login").permitAll()
+                                .requestMatchers("/api/auth/signup").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
+                                .requestMatchers("/api/v1/movies/**").permitAll()
+                                .requestMatchers("/api/v2/movies/**").permitAll()
+                                .requestMatchers("/actuator/health").permitAll()
+                                .requestMatchers("/api/stocks/**").permitAll()
+                                // User 권한만 허용
+//                        .requestMatchers("/api/users/**").hasAuthority(UserRole.Authority.USER)
+//                        .requestMatchers("/api/coupons/*/issue/**").hasAuthority(UserRole.Authority.USER)
+//                        .requestMatchers(HttpMethod.GET, "/api/coupons/**").hasAuthority(UserRole.Authority.USER)
+                                // ADMIN 권한만 허용
+                                .requestMatchers(HttpMethod.PUT, "/api/movies/**").hasAuthority(UserRole.Authority.ADMIN)
+                                .requestMatchers(HttpMethod.DELETE, "/api/movies/**").hasAuthority(UserRole.Authority.ADMIN)
+                                .requestMatchers("/api/coupons/*/stocks").hasAuthority(UserRole.Authority.ADMIN)
+                                .requestMatchers("/api/stocks/**").hasAuthority(UserRole.Authority.ADMIN)
+//                        .requestMatchers("/api/users/**").hasAuthority(UserRole.Authority.ADMIN)
+//                        .requestMatchers("/api/coupons/*/issue/**").hasAuthority(UserRole.Authority.ADMIN)
+//                        .requestMatchers(HttpMethod.GET, "/api/coupons/**").hasAuthority(UserRole.Authority.ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
 
-                        .anyRequest().authenticated()
+                                .anyRequest().authenticated()
                 )
                 .build();
     }

@@ -91,7 +91,7 @@ public class Coupon extends BaseEntity {
 
     private void validateIssuePeriod() {
         if (issueStartAt.isAfter(issueEndAt)) {
-            throw new CustomException(ExceptionCode.INVALID_COUPON_ISSUE_PERIOD);
+            throw new CustomException(ExceptionCode.COUPON_ISSUE_PERIOD_INVALID);
         }
     }
 

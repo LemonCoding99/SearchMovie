@@ -6,11 +6,17 @@ import com.searchmovie.common.model.PageResponse;
 import com.searchmovie.domain.coupon.entity.Coupon;
 import com.searchmovie.domain.coupon.entity.IssuedCouponHistory;
 import com.searchmovie.domain.coupon.entity.IssuedCouponStatus;
+import com.searchmovie.domain.coupon.model.request.CouponCreateRequest;
+import com.searchmovie.domain.coupon.model.request.CouponUpdateRequest;
+import com.searchmovie.domain.coupon.model.response.CouponCreateResponse;
+import com.searchmovie.domain.coupon.model.response.CouponGetResponse;
 import com.searchmovie.domain.coupon.model.response.IssuedCouponHistoryGetDetailResponse;
 import com.searchmovie.domain.coupon.model.response.IssuedCouponHistoryIssueResponse;
 import com.searchmovie.domain.coupon.model.response.IssuedCouponHistoryUseResponse;
 import com.searchmovie.domain.coupon.repository.CouponRepository;
 import com.searchmovie.domain.coupon.repository.IssuedCouponHistoryRepository;
+import com.searchmovie.domain.couponStock.entity.CouponStock;
+import com.searchmovie.domain.couponStock.repository.CouponStockRepository;
 import com.searchmovie.domain.user.entity.User;
 import com.searchmovie.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-
-import com.searchmovie.domain.coupon.model.request.CouponCreateRequest;
-import com.searchmovie.domain.coupon.model.request.CouponUpdateRequest;
-import com.searchmovie.domain.coupon.model.response.CouponCreateResponse;
-import com.searchmovie.domain.coupon.model.response.CouponGetResponse;
-import com.searchmovie.domain.coupon.repository.CouponRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,19 +41,19 @@ public class CouponService {
     @Transactional
     public IssuedCouponHistoryIssueResponse issueMyCoupon(Long userId, Long couponId) {
 
-        User founduser = userRepository.findById(userId)
+        User foundUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.USER_NOT_FOUND));
 
         Coupon foundCoupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_NOT_FOUND));
 
-        LocalDateTime issueStartAt = foundCoupon.getIssueStartAt();
-        LocalDateTime issueEndAt = foundCoupon.getIssueEndAt();
         LocalDateTime now = LocalDateTime.now();
 
         // 발급 기간 확인
+        LocalDateTime issueStartAt = foundCoupon.getIssueStartAt();
+        LocalDateTime issueEndAt = foundCoupon.getIssueEndAt();
         if (now.isBefore(issueStartAt) || now.isAfter(issueEndAt)) {
-           throw new CustomException(ExceptionCode.COUPON_ISSUE_PERIOD_INVALID);
+            throw new CustomException(ExceptionCode.COUPON_ISSUE_PERIOD_INVALID);
         }
 
         // 중복 발급 확인
@@ -68,7 +63,7 @@ public class CouponService {
 
         // 재고 조회 + 소진 체크 + 차감
         CouponStock stock = couponStockRepository.findByCouponId(couponId)
-               .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_STOCK_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_STOCK_NOT_FOUND));
 
         if (stock.getPresentQuantity() <= 0) {
             throw new CustomException(ExceptionCode.COUPON_OUT_OF_STOCK);
@@ -89,20 +84,19 @@ public class CouponService {
             }
             expiredAt = foundCoupon.getUseEndAt();
         }
-        IssuedCouponHistory history = new IssuedCouponHistory(founduser, foundCoupon, now, expiredAt);
 
+        IssuedCouponHistory history = new IssuedCouponHistory(foundUser, foundCoupon, issuedAt, expiredAt);
         IssuedCouponHistory saved = issuedCouponHistoryRepository.save(history);
 
         return IssuedCouponHistoryIssueResponse.from(saved);
     }
 
-
     @Transactional(readOnly = true)
     public PageResponse<IssuedCouponHistoryGetDetailResponse> getMyCouponsDetail(
             Long userId,
             IssuedCouponStatus status,
-            Pageable pageable) {
-
+            Pageable pageable
+    ) {
         // 유저 존재 검증용
         userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.USER_NOT_FOUND));
@@ -110,15 +104,12 @@ public class CouponService {
         Sort sortObj = Sort.by(Sort.Direction.DESC, "issuedAt");
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortObj);
 
-        Page<IssuedCouponHistory> historyPage;
-        if (status == null) {
-            historyPage = issuedCouponHistoryRepository.findByUser_Id(userId, sortedPageable);
+        Page<IssuedCouponHistory> historyPage = (status == null)
+                ? issuedCouponHistoryRepository.findByUser_Id(userId, sortedPageable)
+                : issuedCouponHistoryRepository.findByUser_IdAndStatus(userId, status, sortedPageable);
 
-        } else {
-            historyPage = issuedCouponHistoryRepository.findByUser_IdAndStatus(userId, status, sortedPageable);
-        }
-
-        Page<IssuedCouponHistoryGetDetailResponse> dtoPage = historyPage.map(IssuedCouponHistoryGetDetailResponse::from);
+        Page<IssuedCouponHistoryGetDetailResponse> dtoPage =
+                historyPage.map(IssuedCouponHistoryGetDetailResponse::from);
 
         return PageResponse.from(dtoPage);
     }
@@ -157,13 +148,13 @@ public class CouponService {
         foundIssuedCoupon.use(now);
 
         return IssuedCouponHistoryUseResponse.from(foundIssuedCoupon);
+    }
 
     @Transactional
-    public CouponCreateResponse CreateCoupon(CouponCreateRequest request) {
-        // 사용기간 정책 검증  둘 중에 하나는 있어야되며, 두 개 다 null이거나 두개 다 값이 있으면 안됨
+    public CouponCreateResponse createCoupon(CouponCreateRequest request) {
+
         boolean hasPeriodDays = request.getUsePeriodDays() != null;
-        boolean hasUseAt =
-                request.getUseStartAt() != null || request.getUseEndAt() != null;
+        boolean hasUseAt = request.getUseStartAt() != null || request.getUseEndAt() != null;
 
         // 둘 다 없으면 안 됨
         if (!hasPeriodDays && !hasUseAt) {
@@ -208,8 +199,18 @@ public class CouponService {
     public CouponGetResponse updateCoupon(Long couponId, CouponUpdateRequest request) {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_NOT_FOUND));
-        coupon.update(request.getName(), request.getDiscountRate(), request.getMaxDiscountPrice(), request.getIssueStartAt(),
-                request.getIssueEndAt(), request.getUsePeriodDays(), request.getUseStartAt(), request.getUseEndAt());
+
+        coupon.update(
+                request.getName(),
+                request.getDiscountRate(),
+                request.getMaxDiscountPrice(),
+                request.getIssueStartAt(),
+                request.getIssueEndAt(),
+                request.getUsePeriodDays(),
+                request.getUseStartAt(),
+                request.getUseEndAt()
+        );
+
         return CouponGetResponse.from(coupon);
     }
 

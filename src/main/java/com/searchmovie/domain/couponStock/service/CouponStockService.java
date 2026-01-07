@@ -25,7 +25,7 @@ public class CouponStockService {
     public CouponStockCreateResponse createCouponStock(long couponId, CouponStockCreateRequest request) {
 
         // 존재하는 쿠폰인지 검사
-        if (couponRepository.existsById(couponId)) {
+        if (!couponRepository.existsById(couponId)) {
             throw new CustomException(ExceptionCode.COUPON_NOT_FOUND);
         }
 

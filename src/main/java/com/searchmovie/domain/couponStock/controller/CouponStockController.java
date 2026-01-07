@@ -40,6 +40,6 @@ public class CouponStockController {
     public ResponseEntity<CommonResponse<CouponStockUpdateResponse>> updateCouponStock(@PathVariable Long couponStockId, @RequestBody CouponStockUpdateRequest request) {
 
         CouponStockUpdateResponse result = couponStockService.updateCouponStock(couponStockId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.success(result, "쿠폰 재고 조회 성공"));
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.success(result, "쿠폰 재고 수정 성공"));
     }
 }

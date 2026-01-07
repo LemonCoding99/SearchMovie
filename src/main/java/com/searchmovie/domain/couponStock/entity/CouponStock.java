@@ -40,4 +40,5 @@ public class CouponStock extends BaseEntity {
         this.totalQuantity = request.getTotalQuantity();
         return this;
     }
+    public void decrease(int i) { this.presentQuantity -= i; }
 }

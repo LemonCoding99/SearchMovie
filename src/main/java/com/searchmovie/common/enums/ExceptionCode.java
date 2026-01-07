@@ -61,6 +61,7 @@ public enum ExceptionCode {
     INVALID_COUPON_DISCOUNT(HttpStatus.BAD_REQUEST, "쿠폰 할인 정책이 올바르지 않습니다."),
 
 
+
     // couponStock
     COUPONSTOCK_NOT_FOUND(HttpStatus.NO_CONTENT, "존재하지 않는 쿠폰이거나 쿠폰 재고 정보가 없습니다.");
 
