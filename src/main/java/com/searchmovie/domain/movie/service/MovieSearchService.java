@@ -92,7 +92,7 @@ public class MovieSearchService {
 
     // 영화 검색 로그 생성
     @Transactional
-    @Cacheable(value = "searchCache", key = "'movie:' + #movieId")  // 같은 movieId일 경우 캐시 저장되어 빨리 가져옴
+//    @Cacheable(value = "searchCache", key = "'movie:' + #movieId")  // 같은 movieId일 경우 캐시 저장되어 빨리 가져옴(로컬캐시)
     public MovieSelectCreateResponse createSelect(String keyword, Long userId, Long movieId) {
 
         if (keyword == null || keyword.trim().isEmpty()) {

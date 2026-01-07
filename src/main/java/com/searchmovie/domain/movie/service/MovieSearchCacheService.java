@@ -6,7 +6,6 @@ import com.searchmovie.domain.movie.model.response.SimplePageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,6 +28,7 @@ public class MovieSearchCacheService {
 
     // Redis에 해당 key값이 있으면 가져오고 없으면 CacheMiss 처리
     try {
+        log.info("key={}", key);
         Object cached = redisTemplate.opsForValue().get(key);
         if (cached == null) return null;  // 캐시가 없는 경우 null return
 
@@ -38,7 +38,8 @@ public class MovieSearchCacheService {
             SimplePageResponse<MovieSearchResponse> newType = (SimplePageResponse<MovieSearchResponse>) cached;
             return newType;
         }
-        // 2) 맵 형태라면 DTO로 변환하기
+
+        // 맵 형태라면 DTO로 변환하기
         return objectMapper.convertValue(cached,
                 new com.fasterxml.jackson.core.type.TypeReference<SimplePageResponse<MovieSearchResponse>>() {}  // 익명 클래스 생성
         );
@@ -53,6 +54,7 @@ public class MovieSearchCacheService {
         String key = buildSearchKey(title, director, genreKeyword, releaseDateStart, releaseDateEnd, page, size);
 
         try {
+            log.info("key={}", key);
             redisTemplate.opsForValue().set(key, value, TTL_MINUTES, TimeUnit.MINUTES);
         } catch (Exception e) {
             log.warn("Redis cache save failed. key={}", key, e);
