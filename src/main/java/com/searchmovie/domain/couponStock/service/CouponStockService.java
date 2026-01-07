@@ -11,9 +11,13 @@ import com.searchmovie.domain.couponStock.model.response.CouponStockGetResponse;
 import com.searchmovie.domain.couponStock.model.response.CouponStockUpdateResponse;
 import com.searchmovie.domain.couponStock.repository.CouponStockRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.searchmovie.common.enums.ExceptionCode.COUPONSTOCK_NOT_FOUND;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CouponStockService {
@@ -23,6 +27,8 @@ public class CouponStockService {
 
     @Transactional
     public CouponStockCreateResponse createCouponStock(long couponId, CouponStockCreateRequest request) {
+        CouponStock stock = couponStockRepository.findByIdForLOCK(couponId)
+                .orElseThrow(() -> new CustomException(COUPONSTOCK_NOT_FOUND));
 
         // 존재하는 쿠폰인지 검사
         if (!couponRepository.existsById(couponId)) {
@@ -34,11 +40,9 @@ public class CouponStockService {
             throw new CustomException(ExceptionCode.ALREADY_EXISTS_COUPONSTOCK);
         }
 
-
         CouponStock couponStock = new CouponStock(
-                couponId,
-                request.getTotalQuantity(),
-                request.getVersion()
+                stock.getCouponId(),
+                request.getTotalQuantity()
         );
 
         CouponStock savedCouponStock = couponStockRepository.save(couponStock);
@@ -49,7 +53,7 @@ public class CouponStockService {
     public CouponStockGetResponse getCouponStock(Long couponStockId) {
 
         CouponStock couponStock = couponStockRepository.findById(couponStockId).orElseThrow(
-                () -> new CustomException(ExceptionCode.COUPONSTOCK_NOT_FOUND)
+                () -> new CustomException(COUPONSTOCK_NOT_FOUND)
         );
 
         return CouponStockGetResponse.from(couponStock);
@@ -59,7 +63,7 @@ public class CouponStockService {
     public CouponStockUpdateResponse updateCouponStock(Long couponStockId, CouponStockUpdateRequest request) {
 
         CouponStock couponStock = couponStockRepository.findById(couponStockId).orElseThrow(
-                () -> new CustomException(ExceptionCode.COUPONSTOCK_NOT_FOUND)
+                () -> new CustomException(COUPONSTOCK_NOT_FOUND)
         );
 
         CouponStock updatedCouponStock = couponStock.update(request);

@@ -184,7 +184,7 @@ public class CouponService {
     @Transactional(readOnly = true)
     public CouponGetResponse getCoupon(Long couponId) {
         Coupon coupon = couponRepository.findByIdAndDeletedAtIsNull(couponId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
         return CouponGetResponse.from(coupon);
     }
 
@@ -198,7 +198,7 @@ public class CouponService {
     @Transactional
     public CouponGetResponse updateCoupon(Long couponId, CouponUpdateRequest request) {
         Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
         coupon.update(
                 request.getName(),
@@ -217,7 +217,7 @@ public class CouponService {
     @Transactional
     public void deleteCoupon(Long couponId) {
         Coupon coupon = couponRepository.findByIdAndDeletedAtIsNull(couponId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
         coupon.softDelete();
     }
 }
