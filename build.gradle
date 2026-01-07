@@ -69,6 +69,10 @@ dependencies {
 
     //PasswordEncoder
     implementation 'org.springframework.security:spring-security-crypto:5.7.1'
+
+    // K6 테스트((health check 용)
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 }
 
 tasks.named('test') {

@@ -5,6 +5,7 @@ import com.searchmovie.domain.user.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,15 +34,29 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtFilter, SecurityContextHolderAwareRequestFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        // 권한 없어도 허용
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/signup").permitAll()
-                        .requestMatchers("/api/movies/**").permitAll()
-                        // User 권한만 허용
-                        .requestMatchers("/api/users/**").hasAuthority(UserRole.Authority.USER)
-                        // ADMIN 권한만 허용
-                        .requestMatchers(request -> request.getRequestURI().startsWith("/api/auth/movies")).hasAuthority(UserRole.Authority.ADMIN)
-                        .anyRequest().authenticated()
+                                // 권한 없어도 허용
+                                .requestMatchers("/api/auth/login").permitAll()
+                                .requestMatchers("/api/auth/signup").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
+                                .requestMatchers("/api/v1/movies/**").permitAll()
+                                .requestMatchers("/api/v2/movies/**").permitAll()
+                                .requestMatchers("/actuator/health").permitAll()
+                                .requestMatchers("/api/stocks/**").permitAll()
+                                // User 권한만 허용
+//                        .requestMatchers("/api/users/**").hasAuthority(UserRole.Authority.USER)
+//                        .requestMatchers("/api/coupons/*/issue/**").hasAuthority(UserRole.Authority.USER)
+//                        .requestMatchers(HttpMethod.GET, "/api/coupons/**").hasAuthority(UserRole.Authority.USER)
+                                // ADMIN 권한만 허용
+                                .requestMatchers(HttpMethod.PUT, "/api/movies/**").hasAuthority(UserRole.Authority.ADMIN)
+                                .requestMatchers(HttpMethod.DELETE, "/api/movies/**").hasAuthority(UserRole.Authority.ADMIN)
+                                .requestMatchers("/api/coupons/*/stocks").hasAuthority(UserRole.Authority.ADMIN)
+                                .requestMatchers("/api/stocks/**").hasAuthority(UserRole.Authority.ADMIN)
+//                        .requestMatchers("/api/users/**").hasAuthority(UserRole.Authority.ADMIN)
+//                        .requestMatchers("/api/coupons/*/issue/**").hasAuthority(UserRole.Authority.ADMIN)
+//                        .requestMatchers(HttpMethod.GET, "/api/coupons/**").hasAuthority(UserRole.Authority.ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+
+                                .anyRequest().authenticated()
                 )
                 .build();
     }
