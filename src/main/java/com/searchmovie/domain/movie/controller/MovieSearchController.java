@@ -19,7 +19,7 @@ public class MovieSearchController {
 
     private final MovieSearchService movieSearchService;
 
-    // 영화 전체 검색 Api(캐시 사용하지 않은 버전)
+    // 영화 전체 검색(캐시 사용하지 않은 V1)
     @GetMapping("/v1/movies/search")
     public ResponseEntity<CommonResponse<SimplePageResponse<MovieSearchResponse>>> searchMovie1Api(
             @RequestParam(required = false) String title,
@@ -27,7 +27,7 @@ public class MovieSearchController {
             @RequestParam(required = false) String genreKeyword,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate releaseDateStart,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate releaseDateEnd,
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         SimplePageResponse<MovieSearchResponse> response = movieSearchService.searchMovie1(title, director, genreKeyword, releaseDateStart, releaseDateEnd, page, size);
@@ -35,7 +35,7 @@ public class MovieSearchController {
         return ResponseEntity.ok(CommonResponse.success(response, "success"));
     }
 
-    // 영화 전체 검색 Api
+    // 영화 전체 검색(캐시 사용한 V2)
     @GetMapping("/v2/movies/search")
     public ResponseEntity<CommonResponse<SimplePageResponse<MovieSearchResponse>>> searchMovie2Api(
             @RequestParam(required = false) String title,
@@ -43,13 +43,30 @@ public class MovieSearchController {
             @RequestParam(required = false) String genreKeyword,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate releaseDateStart,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate releaseDateEnd,
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         SimplePageResponse<MovieSearchResponse> response = movieSearchService.searchMovie2(title, director, genreKeyword, releaseDateStart, releaseDateEnd, page, size);
 
         return ResponseEntity.ok(CommonResponse.success(response, "success"));
     }
+
+    // 영화 전체 검색(Redis 캐시 사용한 V3)
+    @GetMapping("/v3/movies/search")
+    public ResponseEntity<CommonResponse<SimplePageResponse<MovieSearchResponse>>> searchMovie3Api(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String director,
+            @RequestParam(required = false) String genreKeyword,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate releaseDateStart,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate releaseDateEnd,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        SimplePageResponse<MovieSearchResponse> response = movieSearchService.searchMovie3(title, director, genreKeyword, releaseDateStart, releaseDateEnd, page, size);
+
+        return ResponseEntity.ok(CommonResponse.success(response, "success"));
+    }
+
 
     // 사용자가 검색 결과를 바탕으로 선택한 영화를 로그로 저장하는 Api
     @PostMapping("/movies/{movieId}/select")
@@ -62,5 +79,8 @@ public class MovieSearchController {
 
         return ResponseEntity.ok(CommonResponse.success(response, "success"));
     }
+
+
+
 
 }
