@@ -1,5 +1,7 @@
 package com.searchmovie.domain.search.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchmovie.domain.search.model.response.GenreKeywordResponse;
 import com.searchmovie.domain.search.model.response.HotKeywordResponse;
 import com.searchmovie.domain.search.model.response.PeriodSearchResponse;
@@ -17,6 +19,7 @@ import java.util.List;
 public class SearchCacheService {
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
 
     private static final Duration TTL = Duration.ofMinutes(5);
 
@@ -31,59 +34,99 @@ public class SearchCacheService {
     // Synthesis
     // =========================
     public void saveSynthesis(List<HotKeywordResponse> items) {
-        redisTemplate.opsForValue().set(KEY_SYNTHESIS, new HotKeywordListWrapper(items), TTL);
-        log.info("[REDIS_SAVE] key={}", KEY_SYNTHESIS);
+
+        try {
+            HotKeywordListWrapper wrapper = new HotKeywordListWrapper(items);
+            String json = objectMapper.writeValueAsString(wrapper);
+            redisTemplate.opsForValue().set(KEY_SYNTHESIS, json, TTL);
+            log.info("[REDIS_SAVE] key={}", KEY_SYNTHESIS);
+        } catch (JsonProcessingException e) {
+            log.error("[REDIS_SAVE_ERROR] 저장 실패: {}", e.getMessage());
+        }
     }
 
     public List<HotKeywordResponse> getSynthesis() {
-        Object cached = redisTemplate.opsForValue().get(KEY_SYNTHESIS);
-        if (cached instanceof HotKeywordListWrapper wrapper) {
+        try {
+            Object cached = redisTemplate.opsForValue().get(KEY_SYNTHESIS);
+            if (cached == null) {
+                log.info("[REDIS_MISS] key={}", KEY_SYNTHESIS);
+                return null;
+            }
+            HotKeywordListWrapper wrapper = objectMapper.readValue(cached.toString(), HotKeywordListWrapper.class);
             log.info("[REDIS_HIT] key={}", KEY_SYNTHESIS);
             return wrapper.items();
+        } catch (Exception e) {
+            log.error("[REDIS_ERROR] Synthesis 역직렬화 실패: {}", e.getMessage());
+            return null;
         }
-        log.info("[REDIS_MISS] key={}", KEY_SYNTHESIS);
-        return null; // 없으면 null로 넘기고, 호출한 서비스가 DB 조회하면 됨
     }
+
 
     // =========================
     // Genre
     // =========================
     public void saveGenre(List<GenreKeywordResponse> items) {
-        redisTemplate.opsForValue().set(KEY_GENRE, new GenreKeywordListWrapper(items), TTL);
-        log.info("[REDIS_SAVE] key={}", KEY_GENRE);
+        try {
+            String json = objectMapper.writeValueAsString(new GenreKeywordListWrapper(items));
+            redisTemplate.opsForValue().set(KEY_GENRE, json, TTL);
+            log.info("[REDIS_SAVE] key={}", KEY_GENRE);
+        } catch (JsonProcessingException e) {
+            log.error("[REDIS_SAVE_ERROR] Genre 저장 실패: {}", e.getMessage());
+        }
     }
 
     public List<GenreKeywordResponse> getGenre() {
-        Object cached = redisTemplate.opsForValue().get(KEY_GENRE);
-        if (cached instanceof GenreKeywordListWrapper wrapper) {
+        try {
+            Object cached = redisTemplate.opsForValue().get(KEY_GENRE);
+            if (cached == null) {
+                log.info("[REDIS_MISS] key={}", KEY_GENRE);
+                return null;
+            }
+            GenreKeywordListWrapper wrapper = objectMapper.readValue(cached.toString(), GenreKeywordListWrapper.class);
             log.info("[REDIS_HIT] key={}", KEY_GENRE);
             return wrapper.items();
+        } catch (Exception e) {
+            log.error("[REDIS_ERROR] Genre 역직렬화 실패: {}", e.getMessage());
+            return null;
         }
-        log.info("[REDIS_MISS] key={}", KEY_GENRE);
-        return null;
     }
+
 
     // =========================
     // Period
     // =========================
     public void savePeriod(int year, int month, PeriodSearchResponse response) {
         String key = KEY_PERIOD(year, month);
-        redisTemplate.opsForValue().set(key, response, TTL);
-        log.info("[REDIS_SAVE] key={}", key);
+        try {
+            String json = objectMapper.writeValueAsString(new PeriodSearchWrapper(response));
+            redisTemplate.opsForValue().set(key, json, TTL);
+            log.info("[REDIS_SAVE] key={}", key);
+        } catch (Exception e) {
+            log.error("[REDIS_SAVE_ERROR] Period 저장 실패: {}", e.getMessage());
+        }
     }
 
     public PeriodSearchResponse getPeriod(int year, int month) {
         String key = KEY_PERIOD(year, month);
-        Object cached = redisTemplate.opsForValue().get(key);
-        if (cached instanceof PeriodSearchResponse period) {
+        try {
+            Object cached = redisTemplate.opsForValue().get(key);
+            if (cached == null) {
+                log.info("[REDIS_MISS] key={}", key);
+            return null;
+            }
+
+            PeriodSearchWrapper wrapper = objectMapper.readValue(cached.toString(), PeriodSearchWrapper.class);
             log.info("[REDIS_HIT] key={}", key);
-            return period;
+            return wrapper.response();
+        } catch (Exception e) {
+            log.error("[REDIS_ERROR] Period 역직렬화 실패: {}", e.getMessage(), e);
+            return null;
         }
-        log.info("[REDIS_MISS] key={}", key);
-        return null;
     }
 
-    // ✅ List 타입 깨짐 방지용 Wrapper
-    public record HotKeywordListWrapper(List<HotKeywordResponse> items) {}
-    public record GenreKeywordListWrapper(List<GenreKeywordResponse> items) {}
+    public record HotKeywordListWrapper(List<HotKeywordResponse> items) {
+    }
+    public record GenreKeywordListWrapper(List<GenreKeywordResponse> items) {
+    }
+    public record PeriodSearchWrapper(PeriodSearchResponse response) { }
 }

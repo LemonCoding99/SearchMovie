@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.searchmovie.common.enums.ExceptionCode.INVALID_MONTH;
@@ -29,11 +30,11 @@ public class HotKeywordController {
 
 
     /**
-     * 종합 인기검색어 TOP 10 (V1 - 캐시)
+     * 종합 인기검색어 TOP 10 (V1)
      */
     @GetMapping("/v1/movies/hot-keywords/synthesis")
     public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> v1synthesis() {
-        List<HotKeywordResponse> response = searchService.v1topOverall();
+        List<HotKeywordResponse> response = searchService.v1topSynthesis();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "종합 인기 검색어 조회 성공", response));
@@ -41,7 +42,7 @@ public class HotKeywordController {
 
 
     /**
-     * 장르별 인기검색어 TOP 10 (V1 - 캐시)
+     * 장르별 인기검색어 TOP 10 (V1)
      */
     @GetMapping("/v1/movies/hot-keywords/genre")
     public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> v1genre() {
@@ -53,19 +54,24 @@ public class HotKeywordController {
 
 
     /**
-     * 월간 인기검색어 TOP 10 (V1 - 캐시)
+     * 월간 인기검색어 TOP 10 (V1)
      */
     @GetMapping("/v1/movies/hot-keywords/period")
     public ResponseEntity<CommonResponse<PeriodSearchResponse>> v1period(@RequestParam(required = false) Integer year,
-                                                                       @RequestParam(required = false) Integer month) {
-        if (year != null && (year < 1900 || year > 2100)) {
+                                                                         @RequestParam(required = false) Integer month) {
+
+        int resolvedYear = (year == null) ? LocalDate.now().getYear() : year;
+        int resolvedMonth = (month == null) ? LocalDate.now().getMonthValue() : month;
+
+
+        if (resolvedYear < 1900 || resolvedYear > 2100) {
             throw new SearchException(INVALID_SEARCH_PERIOD);
         }
-        if (month != null && (month < 1 || month > 12)) {
+        if (resolvedMonth < 1 || resolvedMonth > 12) {
             throw new SearchException(INVALID_MONTH);
         }
 
-        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(year, month);
+        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(resolvedYear, resolvedMonth);
         PeriodSearchResponse response = searchService.v1topPeriod(periodSearchRequest);
 
         return ResponseEntity
@@ -106,14 +112,18 @@ public class HotKeywordController {
     @GetMapping("/v2/movies/hot-keywords/period")
     public ResponseEntity<CommonResponse<PeriodSearchResponse>> v2period(@RequestParam(required = false) Integer year,
                                                                          @RequestParam(required = false) Integer month) {
-        if (year != null && (year < 1900 || year > 2100)) {
+        int resolvedYear = (year == null) ? LocalDate.now().getYear() : year;
+        int resolvedMonth = (month == null) ? LocalDate.now().getMonthValue() : month;
+
+
+        if (resolvedYear < 1900 || resolvedYear > 2100) {
             throw new SearchException(INVALID_SEARCH_PERIOD);
         }
-        if (month != null && (month < 1 || month > 12)) {
+        if (resolvedMonth < 1 || resolvedMonth > 12) {
             throw new SearchException(INVALID_MONTH);
         }
 
-        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(year, month);
+        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(resolvedYear, resolvedMonth);
         PeriodSearchResponse response = searchService.v2topPeriod(periodSearchRequest);
 
         return ResponseEntity
@@ -154,14 +164,18 @@ public class HotKeywordController {
     @GetMapping("/v3/movies/hot-keywords/period")
     public ResponseEntity<CommonResponse<PeriodSearchResponse>> v3period(@RequestParam(required = false) Integer year,
                                                                          @RequestParam(required = false) Integer month) {
-        if (year != null && (year < 1900 || year > 2100)) {
+
+        int resolvedYear = (year == null) ? LocalDate.now().getYear() : year;
+        int resolvedMonth = (month == null) ? LocalDate.now().getMonthValue() : month;
+
+        if (resolvedYear < 1900 || resolvedYear > 2100) {
             throw new SearchException(INVALID_SEARCH_PERIOD);
         }
-        if (month != null && (month < 1 || month > 12)) {
+        if (resolvedMonth < 1 || resolvedMonth > 12) {
             throw new SearchException(INVALID_MONTH);
         }
 
-        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(year, month);
+        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(resolvedYear, resolvedMonth);
         PeriodSearchResponse response = searchService.v3topPeriod(periodSearchRequest);
 
         return ResponseEntity
