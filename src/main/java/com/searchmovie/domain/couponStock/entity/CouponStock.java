@@ -1,7 +1,7 @@
 package com.searchmovie.domain.couponStock.entity;
 
 import com.searchmovie.common.entity.BaseEntity;
-import com.searchmovie.domain.couponStock.model.request.UpdateCouponStockRequest;
+import com.searchmovie.domain.couponStock.model.request.CouponStockUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,7 +35,7 @@ public class CouponStock extends BaseEntity {
         this.version = version;
     }
 
-    public CouponStock update(UpdateCouponStockRequest request) {
+    public CouponStock update(CouponStockUpdateRequest request) {
 
         this.totalQuantity = request.getTotalQuantity();
         return this;

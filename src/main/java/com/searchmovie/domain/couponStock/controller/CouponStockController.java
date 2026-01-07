@@ -1,11 +1,11 @@
 package com.searchmovie.domain.couponStock.controller;
 
 import com.searchmovie.common.model.CommonResponse;
-import com.searchmovie.domain.couponStock.model.request.CreateCouponStockRequest;
-import com.searchmovie.domain.couponStock.model.request.UpdateCouponStockRequest;
-import com.searchmovie.domain.couponStock.model.response.CreateCouponStockResponse;
-import com.searchmovie.domain.couponStock.model.response.GetCouponStockResponse;
-import com.searchmovie.domain.couponStock.model.response.UpdateCouponStockResponse;
+import com.searchmovie.domain.couponStock.model.request.CouponStockCreateRequest;
+import com.searchmovie.domain.couponStock.model.request.CouponStockUpdateRequest;
+import com.searchmovie.domain.couponStock.model.response.CouponStockCreateResponse;
+import com.searchmovie.domain.couponStock.model.response.CouponStockGetResponse;
+import com.searchmovie.domain.couponStock.model.response.CouponStockUpdateResponse;
 import com.searchmovie.domain.couponStock.service.CouponStockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,25 +21,25 @@ public class CouponStockController {
 
     // 쿠폰 추가
     @PostMapping("/{couponId}/stocks")
-    public ResponseEntity<CommonResponse<CreateCouponStockResponse>> createCouponStock(@PathVariable long couponId, @RequestBody CreateCouponStockRequest request) {
+    public ResponseEntity<CommonResponse<CouponStockCreateResponse>> createCouponStock(@PathVariable long couponId, @RequestBody CouponStockCreateRequest request) {
 
-        CreateCouponStockResponse result = couponStockService.createCouponStock(couponId, request);
+        CouponStockCreateResponse result = couponStockService.createCouponStock(couponId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success(result, "쿠폰 생성 성공"));
     }
 
     // 쿠폰 재고 조회
     @GetMapping("/{couponId}/stocks/{couponStockId}")
-    public ResponseEntity<CommonResponse<GetCouponStockResponse>> getCouponStock(@PathVariable Long couponStockId) {
+    public ResponseEntity<CommonResponse<CouponStockGetResponse>> getCouponStock(@PathVariable Long couponStockId) {
 
-        GetCouponStockResponse result = couponStockService.getCouponStock(couponStockId);
+        CouponStockGetResponse result = couponStockService.getCouponStock(couponStockId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.success(result, "쿠폰 재고 조회 성공"));
     }
 
     // 쿠폰 수정
     @PatchMapping("/{couponId}/stocks/{couponStockId}")
-    public ResponseEntity<CommonResponse<UpdateCouponStockResponse>> updateCouponStock(@PathVariable Long couponStockId, @RequestBody UpdateCouponStockRequest request) {
+    public ResponseEntity<CommonResponse<CouponStockUpdateResponse>> updateCouponStock(@PathVariable Long couponStockId, @RequestBody CouponStockUpdateRequest request) {
 
-        UpdateCouponStockResponse result = couponStockService.updateCouponStock(couponStockId, request);
+        CouponStockUpdateResponse result = couponStockService.updateCouponStock(couponStockId, request);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.success(result, "쿠폰 재고 조회 성공"));
     }
 }

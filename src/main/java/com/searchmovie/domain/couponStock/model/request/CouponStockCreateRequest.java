@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class CreateCouponStockRequest {
+public class CouponStockCreateRequest {
 
     @NotBlank(message = "totalQuantity는 필수입니다.")
     int totalQuantity;

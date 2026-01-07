@@ -50,6 +50,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/movies/**").hasAuthority(UserRole.Authority.ADMIN)
                         .requestMatchers("/api/coupons/*/stocks").hasAuthority(UserRole.Authority.ADMIN)
                         .requestMatchers("/api/stocks/**").hasAuthority(UserRole.Authority.ADMIN)
+                        .requestMatchers("/api/users/**").hasAuthority(UserRole.Authority.ADMIN)
+                        .requestMatchers("/api/coupons/*/issue/**").hasAuthority(UserRole.Authority.ADMIN)
+                        .requestMatchers(HttpMethod.GET, "/api/coupons/**").hasAuthority(UserRole.Authority.ADMIN)
                         .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
 
                         .anyRequest().authenticated()

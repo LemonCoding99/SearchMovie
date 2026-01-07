@@ -6,33 +6,27 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class UpdateCouponStockResponse {
+public class CouponStockGetResponse {
     private final long id;
     private final long couponId;
     private final int totalQuantity;
     private final int presentQuantity;
-    private final long version;
-    private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public UpdateCouponStockResponse(long id, long couponId, int totalQuantity, int presentQuantity, long version, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CouponStockGetResponse(long id, long couponId, int totalQuantity, int presentQuantity, LocalDateTime updatedAt) {
         this.id = id;
         this.couponId = couponId;
         this.totalQuantity = totalQuantity;
         this.presentQuantity = presentQuantity;
-        this.version = version;
-        this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public static UpdateCouponStockResponse from(CouponStock couponStock) {
-        return new UpdateCouponStockResponse(
+    public static CouponStockGetResponse from(CouponStock couponStock) {
+        return new CouponStockGetResponse(
                 couponStock.getId(),
                 couponStock.getCouponId(),
                 couponStock.getTotalQuantity(),
                 couponStock.getPresentQuantity(),
-                couponStock.getVersion(),
-                couponStock.getCreatedAt(),
                 couponStock.getUpdatedAt()
         );
     }
