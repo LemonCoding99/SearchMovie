@@ -159,7 +159,7 @@ public class HotKeywordController {
     }
 
     /**
-     * 월간 인기검색어 TOP 10 (V2 - 캐시)
+     * 월간 인기검색어 TOP 10 (V3 - 캐시)
      */
     @GetMapping("/v3/movies/hot-keywords/period")
     public ResponseEntity<CommonResponse<PeriodSearchResponse>> v3period(@RequestParam(required = false) Integer year,
