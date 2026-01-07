@@ -75,9 +75,8 @@ public class HotKeywordController {
 
 
     // ==================================================
-    // V2 (캐시 적용)
+    // V2 (Spring 캐시 적용)
     // ==================================================
-
 
     /**
      * 종합 인기검색어 TOP 10 (V2 - 캐시)
@@ -122,4 +121,51 @@ public class HotKeywordController {
                 .body(new CommonResponse<>(true, "월간 인기 검색어 조회 성공", response));
     }
 
+
+    // ==================================================
+    // V3 (Redis)
+    // ==================================================
+
+    /**
+     * 종합 인기검색어 TOP 10 (V3 - 캐시)
+     */
+    @GetMapping("/v3/movies/hot-keywords/synthesis")
+    public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> v3synthesis() {
+        List<HotKeywordResponse> response = searchService.v3topSynthesis();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new CommonResponse<>(true, "종합 인기 검색어 조회 성공", response));
+    }
+
+    /**
+     * 장르별 인기검색어 TOP 10 (V3 - 캐시)
+     */
+    @GetMapping("/v3/movies/hot-keywords/genre")
+    public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> v3genre() {
+        List<GenreKeywordResponse> response = searchService.v3topGenre();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new CommonResponse<>(true, "장르별 인기 검색어 조회 성공", response));
+    }
+
+    /**
+     * 월간 인기검색어 TOP 10 (V2 - 캐시)
+     */
+    @GetMapping("/v3/movies/hot-keywords/period")
+    public ResponseEntity<CommonResponse<PeriodSearchResponse>> v3period(@RequestParam(required = false) Integer year,
+                                                                         @RequestParam(required = false) Integer month) {
+        if (year != null && (year < 1900 || year > 2100)) {
+            throw new SearchException(INVALID_SEARCH_PERIOD);
+        }
+        if (month != null && (month < 1 || month > 12)) {
+            throw new SearchException(INVALID_MONTH);
+        }
+
+        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(year, month);
+        PeriodSearchResponse response = searchService.v3topPeriod(periodSearchRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new CommonResponse<>(true, "월간 인기 검색어 조회 성공", response));
+    }
 }
