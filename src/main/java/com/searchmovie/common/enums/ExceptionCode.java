@@ -58,11 +58,11 @@ public enum ExceptionCode {
     COUPON_OUT_OF_STOCK(HttpStatus.CONFLICT, "쿠폰 수량이 소진되었습니다."),
     COUPON_POLICY_INVALID(HttpStatus.BAD_REQUEST, "쿠폰 정책이 올바르지 않습니다."),
     INVALID_COUPON_USE_POLICY(HttpStatus.BAD_REQUEST, "쿠폰 사용기간 정책이 올바르지 않습니다."),
-    INVALID_COUPON_DISCOUNT(HttpStatus.BAD_REQUEST, "쿠폰 할인 정책이 올바르지 않습니다.");
+    INVALID_COUPON_DISCOUNT(HttpStatus.BAD_REQUEST, "쿠폰 할인 정책이 올바르지 않습니다."),
 
 
-
-
+    // couponStock
+    COUPONSTOCK_NOT_FOUND(HttpStatus.NO_CONTENT, "존재하지 않는 쿠폰이거나 쿠폰 재고 정보가 없습니다.");
 
 
     private final HttpStatus status;
