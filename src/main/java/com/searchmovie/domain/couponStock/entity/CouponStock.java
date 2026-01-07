@@ -25,6 +25,7 @@ public class CouponStock extends BaseEntity {
     @Column(name = "present_quantity")
     private int presentQuantity;
 
+    @Version
     @Column(name = "version")
     private long version;
 
@@ -40,5 +41,11 @@ public class CouponStock extends BaseEntity {
         this.totalQuantity = request.getTotalQuantity();
         return this;
     }
-    public void decrease(int i) { this.presentQuantity -= i; }
+
+    // 쿠폰 감소 메서드
+    public void decrease(int quantity) {
+        if (totalQuantity - presentQuantity < 0) {
+            throw new IllegalArgumentException("쿠폰이 소진되었습니다.");
+        }
+        this.presentQuantity -= quantity; }
 }

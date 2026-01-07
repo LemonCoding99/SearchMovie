@@ -11,15 +11,19 @@ import com.searchmovie.domain.couponStock.model.response.CouponStockGetResponse;
 import com.searchmovie.domain.couponStock.model.response.CouponStockUpdateResponse;
 import com.searchmovie.domain.couponStock.repository.CouponStockRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CouponStockService {
 
     private final CouponStockRepository couponStockRepository;
     private final CouponRepository couponRepository;
+    private final CouponCoreService couponCoreService;
 
     @Transactional
     public CouponStockCreateResponse createCouponStock(long couponId, CouponStockCreateRequest request) {
@@ -65,4 +69,30 @@ public class CouponStockService {
         CouponStock updatedCouponStock = couponStock.update(request);
         return CouponStockUpdateResponse.from(updatedCouponStock);
     }
+
+
+    // 쿠폰 발급 로직
+    public void decreaseStock(Long couponId, int quantity) {
+
+        int retry = 0;
+        while (retry < 10) {  // 10번만 재시도하고 안되면 예외 처리
+            try {
+                couponCoreService.withdraw(couponId, quantity);
+                return;
+
+            } catch (ObjectOptimisticLockingFailureException e) {  // 낙관적 락 예외 잡아서 처리
+
+                retry++;
+                log.info("충돌 발생! 락 획득 재시도 로직 수행 재시도 횟수: {}", retry);
+
+                try {
+                    Thread.sleep(100);  // 100ms 대기 후 재시도
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
+        throw new IllegalArgumentException("쿠폰 발급에 실패했습니다.");
+    }
+
 }
