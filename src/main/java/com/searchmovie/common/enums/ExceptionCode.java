@@ -63,7 +63,8 @@ public enum ExceptionCode {
 
 
     // couponStock
-    COUPONSTOCK_NOT_FOUND(HttpStatus.NO_CONTENT, "존재하지 않는 쿠폰이거나 쿠폰 재고 정보가 없습니다.");
+    COUPONSTOCK_NOT_FOUND(HttpStatus.NO_CONTENT, "존재하지 않는 쿠폰이거나 쿠폰 재고 정보가 없습니다."),
+    ALREADY_EXISTS_COUPONSTOCK(HttpStatus.CONFLICT, "이미 존재하는 쿠폰 재고입니다.");
 
 
     private final HttpStatus status;

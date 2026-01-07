@@ -29,6 +29,12 @@ public class CouponStockService {
             throw new CustomException(ExceptionCode.COUPON_NOT_FOUND);
         }
 
+        // 해당 쿠폰의 쿠폰재고가 이미 존재한다면 에러 발생
+        if (couponStockRepository.existsByCouponId(couponId)) {
+            throw new CustomException(ExceptionCode.ALREADY_EXISTS_COUPONSTOCK);
+        }
+
+
         CouponStock couponStock = new CouponStock(
                 couponId,
                 request.getTotalQuantity(),
