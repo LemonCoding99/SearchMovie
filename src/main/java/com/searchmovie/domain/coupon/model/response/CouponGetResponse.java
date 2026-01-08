@@ -33,6 +33,7 @@ public class CouponGetResponse {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
     public static CouponGetResponse from(Coupon coupon) {
         return new CouponGetResponse(
                 coupon.getId(),

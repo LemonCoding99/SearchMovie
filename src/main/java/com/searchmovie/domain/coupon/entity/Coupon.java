@@ -56,7 +56,7 @@ public class Coupon extends BaseEntity {
     @Column(name = "use_end_at")
     private LocalDateTime useEndAt;
 
-    public Coupon(String name, Integer discountRate, Integer  maxDiscountPrice, LocalDateTime issueStartAt, LocalDateTime issueEndAt, Integer usePeriodDays, LocalDateTime useStartAt, LocalDateTime useEndAt) {
+    public Coupon(String name, Integer discountRate, Integer maxDiscountPrice, LocalDateTime issueStartAt, LocalDateTime issueEndAt, Integer usePeriodDays, LocalDateTime useStartAt, LocalDateTime useEndAt) {
         this.name = name;
         this.discountRate = discountRate;
         this.maxDiscountPrice = maxDiscountPrice;
@@ -65,9 +65,11 @@ public class Coupon extends BaseEntity {
         this.usePeriodDays = usePeriodDays;
         this.useStartAt = useStartAt;
         this.useEndAt = useEndAt;
+
+        validate();
     }
 
-    public void update(String name, Integer discountRate, Integer  maxDiscountPrice, LocalDateTime issueStartAt, LocalDateTime issueEndAt, Integer usePeriodDays, LocalDateTime useStartAt, LocalDateTime useEndAt) {
+    public void update(String name, Integer discountRate, Integer maxDiscountPrice, LocalDateTime issueStartAt, LocalDateTime issueEndAt, Integer usePeriodDays, LocalDateTime useStartAt, LocalDateTime useEndAt) {
         if (name != null) this.name = name;
         if (discountRate != null) this.discountRate = discountRate;
         if (maxDiscountPrice != null) this.maxDiscountPrice = maxDiscountPrice;
