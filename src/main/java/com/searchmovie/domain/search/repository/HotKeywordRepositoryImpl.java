@@ -6,9 +6,11 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.searchmovie.domain.search.model.response.*;
 import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
+
 import static com.searchmovie.domain.movie.entity.QGenre.genre;
 import static com.searchmovie.domain.movie.entity.QMovie.movie;
 import static com.searchmovie.domain.movie.entity.QMovieGenre.movieGenre;
@@ -19,7 +21,7 @@ public class HotKeywordRepositoryImpl implements HotKeywordRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    //월간 인기검색 조건용
+    // 기간별 조회를 위한 검색 조건 생성 (Querydsl BooleanExpression)
     private BooleanExpression searchedBetween(LocalDateTime from, LocalDateTime to) {
         if (from == null && to == null) return null;
         if (from == null) return hotKeyword.searchedAt.lt(to);
@@ -27,18 +29,15 @@ public class HotKeywordRepositoryImpl implements HotKeywordRepositoryCustom {
         return hotKeyword.searchedAt.goe(from).and(hotKeyword.searchedAt.lt(to));
     }
 
-
-    /**
-     * 장르별 인기검색어 TOP 10
-     */
+    //종합 인기검색어 TOP 10
     @Override
-    public List<HotKeywordResponse> findTopKeywords() {
+    public List<SynthesisRankResponse> fetchSynthesisTop10() {
 
         NumberExpression<Long> score = hotKeyword.id.count();
 
-        List<SearchKeywordResponse> rows = queryFactory
+        List<RepositoryInSynthesisDto> rows = queryFactory
                 .select(Projections.constructor(
-                        SearchKeywordResponse.class,
+                        RepositoryInSynthesisDto.class,
                         hotKeyword.keyword,
                         movie.title,
                         genre.name,
@@ -62,7 +61,7 @@ public class HotKeywordRepositoryImpl implements HotKeywordRepositoryCustom {
                 .fetch();
 
         return IntStream.range(0, rows.size())
-                .mapToObj(i -> new HotKeywordResponse(
+                .mapToObj(i -> new SynthesisRankResponse(
                         i + 1,
                         rows.get(i).getKeyword(),
                         rows.get(i).getTitle(),
@@ -74,18 +73,15 @@ public class HotKeywordRepositoryImpl implements HotKeywordRepositoryCustom {
                 .toList();
     }
 
-
-            /**
-             * 장르별 인기검색어 TOP 10
-             */
+    //장르별 인기검색어 TOP 10
     @Override
-    public List<GenreKeywordResponse> findTopGenres() {
+    public List<GenreRankResponse> fetchGenreTop10() {
 
         NumberExpression<Long> score = hotKeyword.id.count();
 
-        List<SearchGenresResponse> rows = queryFactory
+        List<RepositoryInGenresDto> rows = queryFactory
                 .select(Projections.constructor(
-                        SearchGenresResponse.class,
+                        RepositoryInGenresDto.class,
                         genre.name,
                         score
                 ))
@@ -99,7 +95,7 @@ public class HotKeywordRepositoryImpl implements HotKeywordRepositoryCustom {
                 .fetch();
 
         return IntStream.range(0, rows.size())
-                .mapToObj(i -> new GenreKeywordResponse(
+                .mapToObj(i -> new GenreRankResponse(
                         i + 1,
                         rows.get(i).getGenre(),
                         rows.get(i).getScore()
@@ -107,18 +103,15 @@ public class HotKeywordRepositoryImpl implements HotKeywordRepositoryCustom {
                 .toList();
     }
 
-
-            /**
-             * 월간 인기검색어 TOP 10
-             */
+    //월간 인기검색어 TOP 10
     @Override
-    public List<PeriodKeywordResponse> findTopPeriod(LocalDateTime from, LocalDateTime to) {
+    public List<PeriodRankResponse> fetchPeriodTop10(LocalDateTime from, LocalDateTime to) {
 
         NumberExpression<Long> score = hotKeyword.id.count();
 
-        List<SearchPeriodResponse> rows = queryFactory
+        List<RepositoryInPeriodDto> rows = queryFactory
                 .select(Projections.constructor(
-                        SearchPeriodResponse.class,
+                        RepositoryInPeriodDto.class,
                         hotKeyword.keyword,
                         movie.title,
                         genre.name,
@@ -145,7 +138,7 @@ public class HotKeywordRepositoryImpl implements HotKeywordRepositoryCustom {
                 .fetch();
 
         return IntStream.range(0, rows.size())
-                .mapToObj(i -> new PeriodKeywordResponse(
+                .mapToObj(i -> new PeriodRankResponse(
                         i + 1,
                         rows.get(i).getKeyword(),
                         rows.get(i).getTitle(),

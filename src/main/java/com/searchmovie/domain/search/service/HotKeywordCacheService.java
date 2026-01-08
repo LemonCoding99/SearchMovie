@@ -2,9 +2,9 @@ package com.searchmovie.domain.search.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.searchmovie.domain.search.model.response.GenreKeywordResponse;
-import com.searchmovie.domain.search.model.response.HotKeywordResponse;
-import com.searchmovie.domain.search.model.response.PeriodSearchResponse;
+import com.searchmovie.domain.search.model.response.GenreRankResponse;
+import com.searchmovie.domain.search.model.response.PeriodRankListResponse;
+import com.searchmovie.domain.search.model.response.SynthesisRankResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,7 +33,7 @@ public class HotKeywordCacheService {
     // =========================
     // Synthesis
     // =========================
-    public void saveSynthesis(List<HotKeywordResponse> items) {
+    public void saveSynthesis(List<SynthesisRankResponse> items) {
 
         try {
             HotKeywordListWrapper wrapper = new HotKeywordListWrapper(items);
@@ -45,7 +45,7 @@ public class HotKeywordCacheService {
         }
     }
 
-    public List<HotKeywordResponse> getSynthesis() {
+    public List<SynthesisRankResponse> getSynthesis() {
         try {
             Object cached = redisTemplate.opsForValue().get(KEY_SYNTHESIS);
             if (cached == null) {
@@ -65,7 +65,7 @@ public class HotKeywordCacheService {
     // =========================
     // Genre
     // =========================
-    public void saveGenre(List<GenreKeywordResponse> items) {
+    public void saveGenre(List<GenreRankResponse> items) {
         try {
             String json = objectMapper.writeValueAsString(new GenreKeywordListWrapper(items));
             redisTemplate.opsForValue().set(KEY_GENRE, json, TTL);
@@ -75,7 +75,7 @@ public class HotKeywordCacheService {
         }
     }
 
-    public List<GenreKeywordResponse> getGenre() {
+    public List<GenreRankResponse> getGenre() {
         try {
             Object cached = redisTemplate.opsForValue().get(KEY_GENRE);
             if (cached == null) {
@@ -95,7 +95,7 @@ public class HotKeywordCacheService {
     // =========================
     // Period
     // =========================
-    public void savePeriod(int year, int month, PeriodSearchResponse response) {
+    public void savePeriod(int year, int month, PeriodRankListResponse response) {
         String key = KEY_PERIOD(year, month);
         try {
             String json = objectMapper.writeValueAsString(new PeriodSearchWrapper(response));
@@ -106,13 +106,13 @@ public class HotKeywordCacheService {
         }
     }
 
-    public PeriodSearchResponse getPeriod(int year, int month) {
+    public PeriodRankListResponse getPeriod(int year, int month) {
         String key = KEY_PERIOD(year, month);
         try {
             Object cached = redisTemplate.opsForValue().get(key);
             if (cached == null) {
                 log.info("[REDIS_MISS] key={}", key);
-            return null;
+                return null;
             }
 
             PeriodSearchWrapper wrapper = objectMapper.readValue(cached.toString(), PeriodSearchWrapper.class);
@@ -124,9 +124,12 @@ public class HotKeywordCacheService {
         }
     }
 
-    public record HotKeywordListWrapper(List<HotKeywordResponse> items) {
+    public record HotKeywordListWrapper(List<SynthesisRankResponse> items) {
     }
-    public record GenreKeywordListWrapper(List<GenreKeywordResponse> items) {
+
+    public record GenreKeywordListWrapper(List<GenreRankResponse> items) {
     }
-    public record PeriodSearchWrapper(PeriodSearchResponse response) { }
+
+    public record PeriodSearchWrapper(PeriodRankListResponse response) {
+    }
 }

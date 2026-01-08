@@ -21,13 +21,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(exceptionCode.getStatus()).body(response);
     }
 
-    @ExceptionHandler(SearchException.class)
-    public ResponseEntity<CommonResponse<Void>> securityException(SearchException e) {
-        ExceptionCode exceptionCode = e.getExceptionCode();
-        CommonResponse<Void> response = new CommonResponse<>(false, exceptionCode.getMessage(), null);
-        return ResponseEntity.status(exceptionCode.getStatus()).body(response);
-    }
-
+    //500 에러용
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CommonResponse<Void>> handleException(Exception e) {
         CommonResponse<Void> response = new CommonResponse<>(false, ExceptionCode.INTERNAL_SERVER_ERROR.getMessage(), null);

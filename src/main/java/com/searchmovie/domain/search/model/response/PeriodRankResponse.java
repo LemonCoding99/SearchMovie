@@ -7,8 +7,9 @@ import java.time.LocalDate;
 
 @Getter
 @RequiredArgsConstructor
-public class SearchPeriodResponse {
+public class PeriodRankResponse {
 
+    private final int rank;
     private final String keyword;
     private final String title;
     private final String genre;
