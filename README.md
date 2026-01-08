@@ -347,12 +347,15 @@ C:.
 
 
 - 주요 테이블
-    - `users`: 사용자
-    - `tasks`: 작업
-    - `teams`: 팀
-    - `team_members`: 팀 멤버
-    - `comments`: 댓글
-    - `activities`: 활동 로그
+    - `coupon_inventories`: 쿠폰 재고
+    - `coupons`: 쿠폰
+    - `genres`: 장르
+    - `issued_coupon_histories`: 팀 멤버
+    - `movie_genres`: 영화 장르(영화와 장르 연결)
+    - `movies`: 영화
+    - `reviews`: 리뷰
+    - `search_logs`: 검색 기록
+    - `users`: 회원
 
 
 - API 상세설명 : https://www.notion.so/teamsparta/2cb2dc3ef51481b28cb6feb491c41c44?v=2cb2dc3ef514815cbd0a000c37ebb10a&source=copy_link
