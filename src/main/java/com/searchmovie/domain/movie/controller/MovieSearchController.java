@@ -8,6 +8,7 @@ import com.searchmovie.domain.movie.service.MovieSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -72,15 +73,12 @@ public class MovieSearchController {
     @PostMapping("/movies/{movieId}/select")
     public ResponseEntity<CommonResponse<MovieSelectCreateResponse>> createSelectApi(
             @RequestParam String keyword,
-            @RequestParam Long userId,  // SpringSecurity 추가 후 @AuthenticationPrincipal로 변경하기➕
+            @AuthenticationPrincipal Long userId,
             @PathVariable Long movieId
     ) {
         MovieSelectCreateResponse response = movieSearchService.createSelect(keyword, userId, movieId);
 
         return ResponseEntity.ok(CommonResponse.success(response, "success"));
     }
-
-
-
 
 }

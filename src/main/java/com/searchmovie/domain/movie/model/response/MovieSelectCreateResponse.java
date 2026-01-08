@@ -20,8 +20,6 @@ public class MovieSelectCreateResponse {
                 hotKeyword.getId(),
                 hotKeyword.getUserId(),
                 hotKeyword.getMovieId(),
-//                hotKeyword.getUser().getId(),
-//                hotKeyword.getMovie().getId(),
                 hotKeyword.getKeyword(),
                 hotKeyword.getSearchedAt()
         );
