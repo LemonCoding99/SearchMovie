@@ -10,11 +10,14 @@ import java.util.Optional;
 
 public interface IssuedCouponHistoryRepository extends JpaRepository<IssuedCouponHistory, Long> {
 
-    Page<IssuedCouponHistory> findByUser_Id(Long userId, Pageable sortedPageable);
+    Page<IssuedCouponHistory> findByUser_IdAndDeletedAtIsNull(Long userId, Pageable sortedPageable);
 
-    Page<IssuedCouponHistory> findByUser_IdAndStatus(Long userId, IssuedCouponStatus status, Pageable sortedPageable);
+    Page<IssuedCouponHistory> findByUser_IdAndStatusAndDeletedAtIsNull(
+            Long userId,
+            IssuedCouponStatus status,
+            Pageable sortedPageable);
 
-    Optional<IssuedCouponHistory> findByIdAndUser_Id(Long issuedCouponId, Long userId);
+    Optional<IssuedCouponHistory> findByIdAndUser_IdAndDeletedAtIsNull(Long issuedCouponId, Long userId);
 
     boolean existsByUser_IdAndCoupon_Id(Long userId, Long couponId);
 }
