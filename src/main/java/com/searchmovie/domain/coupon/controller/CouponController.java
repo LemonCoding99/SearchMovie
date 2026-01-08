@@ -9,6 +9,7 @@ import com.searchmovie.domain.coupon.model.response.IssuedCouponHistoryUseRespon
 import com.searchmovie.domain.coupon.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,6 @@ public class CouponController {
 
     private final CouponService couponService;
 
-    // 쿠폰 발급
     @PostMapping("/coupons/{couponId}/issue")
     public ResponseEntity<CommonResponse<IssuedCouponHistoryIssueResponse>> issueCoupon(
             @AuthenticationPrincipal Long userId,
@@ -42,12 +42,11 @@ public class CouponController {
                 .body(CommonResponse.success(result, "쿠폰 발급 성공"));
     }
 
-    // 내 쿠폰 목록 조회
     @GetMapping("/users/me/coupons")
     public ResponseEntity<CommonResponse<PageResponse<IssuedCouponHistoryGetDetailResponse>>> getMyCouponsDetail(
             @AuthenticationPrincipal Long userId,
             @RequestParam(required = false) IssuedCouponStatus status,
-            @PageableDefault(page = 0, size = 10) Pageable pageable) {
+            @PageableDefault(page = 0, size = 10, sort = "issuedAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         PageResponse<IssuedCouponHistoryGetDetailResponse> result = couponService.getMyCouponsDetail(userId, status, pageable);
 
@@ -56,7 +55,6 @@ public class CouponController {
                 .body(CommonResponse.success(result, "내 쿠폰 조회 성공"));
     }
 
-    // 쿠폰 사용
     @PatchMapping("/users/me/coupons/{issuedCouponId}/use")
     public ResponseEntity<CommonResponse<IssuedCouponHistoryUseResponse>> useMyCoupon(
             @AuthenticationPrincipal Long userId,
@@ -69,6 +67,7 @@ public class CouponController {
                 .body(CommonResponse.success(result, "쿠폰 사용 처리 성공"));
 
     }
+
 
     // 쿠폰 생성
     @Secured(UserRole.Authority.ADMIN)

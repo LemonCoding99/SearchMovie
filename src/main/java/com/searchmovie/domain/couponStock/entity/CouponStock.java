@@ -1,6 +1,8 @@
 package com.searchmovie.domain.couponStock.entity;
 
 import com.searchmovie.common.entity.BaseEntity;
+import com.searchmovie.common.enums.ExceptionCode;
+import com.searchmovie.common.exception.CustomException;
 import com.searchmovie.domain.couponStock.model.request.CouponStockUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -44,8 +46,8 @@ public class CouponStock extends BaseEntity {
 
     // 쿠폰 감소 메서드
     public void decrease(int quantity) {
-        if (totalQuantity - presentQuantity < 0) {
-            throw new IllegalArgumentException("쿠폰이 소진되었습니다.");
+        if (this.presentQuantity < quantity) {
+            throw new CustomException(ExceptionCode.COUPON_OUT_OF_STOCK);
         }
         this.presentQuantity -= quantity; }
 }

@@ -15,17 +15,12 @@ import com.searchmovie.domain.coupon.model.response.IssuedCouponHistoryIssueResp
 import com.searchmovie.domain.coupon.model.response.IssuedCouponHistoryUseResponse;
 import com.searchmovie.domain.coupon.repository.CouponRepository;
 import com.searchmovie.domain.coupon.repository.IssuedCouponHistoryRepository;
-import com.searchmovie.domain.couponStock.entity.CouponStock;
-import com.searchmovie.domain.couponStock.repository.CouponStockRepository;
-import com.searchmovie.domain.couponStock.service.CouponCoreService;
 import com.searchmovie.domain.couponStock.service.CouponStockService;
 import com.searchmovie.domain.user.entity.User;
 import com.searchmovie.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,57 +32,24 @@ public class CouponService {
 
     private final CouponRepository couponRepository;
     private final IssuedCouponHistoryRepository issuedCouponHistoryRepository;
-    private final CouponStockRepository couponStockRepository;
     private final UserRepository userRepository;
     private final CouponStockService couponStockService;
 
+    // 쿠폰 발급: 발급 기간/중복 발급 검증 후 재고 차감 및 발급 기록 생성
     @Transactional
     public IssuedCouponHistoryIssueResponse issueMyCoupon(Long userId, Long couponId) {
 
-        User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.USER_NOT_FOUND));
+        User foundUser = getUserOrThrow(userId);
+        Coupon foundCoupon = getCouponOrThrow(couponId);
 
-        Coupon foundCoupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_NOT_FOUND));
+        validateIssueStartAtAndIssueEndAt(foundCoupon);
+        validateDuplicateIssue(userId, couponId);
 
-        LocalDateTime now = LocalDateTime.now();
+        // 쿠폰 수량 차감
+        couponStockService.decreaseStock(couponId, 1);
 
-        // 발급 기간 확인
-        LocalDateTime issueStartAt = foundCoupon.getIssueStartAt();
-        LocalDateTime issueEndAt = foundCoupon.getIssueEndAt();
-        if (now.isBefore(issueStartAt) || now.isAfter(issueEndAt)) {
-            throw new CustomException(ExceptionCode.COUPON_ISSUE_PERIOD_INVALID);
-        }
-
-        // 중복 발급 확인
-        if (issuedCouponHistoryRepository.existsByUser_IdAndCoupon_Id(userId, couponId)) {
-            throw new CustomException(ExceptionCode.COUPON_ALREADY_ISSUED);
-        }
-
-        // 재고 조회 + 소진 체크 + 차감
-        CouponStock stock = couponStockRepository.findByCouponId(couponId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_STOCK_NOT_FOUND));
-
-        if (stock.getPresentQuantity() <= 0) {
-            throw new CustomException(ExceptionCode.COUPON_OUT_OF_STOCK);
-        }
-
-        couponStockService.decreaseStock(couponId, 1); // 낙관적 락 적용하면서 바뀐 부분
-
-        // 만료일 계산
-        LocalDateTime issuedAt = now;
-        LocalDateTime expiredAt;
-
-        Integer periodDays = foundCoupon.getUsePeriodDays();
-        if (periodDays != null) {
-            expiredAt = issuedAt.plusDays(periodDays);
-        } else {
-            // 기간 고정 쿠폰
-            if (foundCoupon.getUseEndAt() == null) {
-                throw new CustomException(ExceptionCode.COUPON_POLICY_INVALID);
-            }
-            expiredAt = foundCoupon.getUseEndAt();
-        }
+        LocalDateTime issuedAt = LocalDateTime.now();
+        LocalDateTime expiredAt = calculateExpiredAt(foundCoupon, issuedAt);
 
         IssuedCouponHistory history = new IssuedCouponHistory(foundUser, foundCoupon, issuedAt, expiredAt);
         IssuedCouponHistory saved = issuedCouponHistoryRepository.save(history);
@@ -95,58 +57,41 @@ public class CouponService {
         return IssuedCouponHistoryIssueResponse.from(saved);
     }
 
+    // 내 쿠폰 조회: 상태별 필터링 및 발급일 기준 페이징 조회
     @Transactional(readOnly = true)
     public PageResponse<IssuedCouponHistoryGetDetailResponse> getMyCouponsDetail(
             Long userId,
             IssuedCouponStatus status,
-            Pageable pageable
-    ) {
+            Pageable pageable) {
+
         // 유저 존재 검증용
-        userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.USER_NOT_FOUND));
+        getUserOrThrow(userId);
 
-        Sort sortObj = Sort.by(Sort.Direction.DESC, "issuedAt");
-        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortObj);
-
+        // status가 없으면 전체, 있으면 상태별 필터링
         Page<IssuedCouponHistory> historyPage = (status == null)
-                ? issuedCouponHistoryRepository.findByUser_Id(userId, sortedPageable)
-                : issuedCouponHistoryRepository.findByUser_IdAndStatus(userId, status, sortedPageable);
+                ? issuedCouponHistoryRepository.findByUser_IdAndDeletedAtIsNull(userId, pageable)
+                : issuedCouponHistoryRepository.findByUser_IdAndStatusAndDeletedAtIsNull(userId, status, pageable);
 
+        // 엔티티 -> 응답 DTO 변환
         Page<IssuedCouponHistoryGetDetailResponse> dtoPage =
                 historyPage.map(IssuedCouponHistoryGetDetailResponse::from);
 
         return PageResponse.from(dtoPage);
     }
 
+    // 쿠폰 사용: 본인 쿠폰 여부 및 사용 가능 조건 검증 후 사용 처리
     @Transactional
     public IssuedCouponHistoryUseResponse useMyCoupon(Long userId, Long issuedCouponId) {
 
         // 유저 존재 검증용
-        userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.USER_NOT_FOUND));
+        getUserOrThrow(userId);
+        IssuedCouponHistory foundIssuedCoupon = getMyIssuedCouponOrThrow(issuedCouponId, userId);
 
-        // 내 쿠폰인지 조회
-        IssuedCouponHistory foundIssuedCoupon = issuedCouponHistoryRepository
-                .findByIdAndUser_Id(issuedCouponId, userId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.ISSUED_COUPON_NOT_FOUND));
-
-        // 이미 사용한 쿠폰인지 확인
-        if (foundIssuedCoupon.getStatus() == IssuedCouponStatus.USED) {
-            throw new CustomException(ExceptionCode.COUPON_ALREADY_USED);
-        }
+        validateNotUsed(foundIssuedCoupon);
 
         LocalDateTime now = LocalDateTime.now();
-
-        // 만료된 쿠폰
-        if (foundIssuedCoupon.getExpiredAt().isBefore(now)) {
-            throw new CustomException(ExceptionCode.COUPON_EXPIRED);
-        }
-
-        // 사용 시작 전 쿠폰
-        LocalDateTime useStartAt = foundIssuedCoupon.getCoupon().getUseStartAt();
-        if (useStartAt != null && useStartAt.isAfter(now)) {
-            throw new CustomException(ExceptionCode.COUPON_NOT_STARTED);
-        }
+        validateNotExpired(foundIssuedCoupon, now);
+        validateStarted(foundIssuedCoupon, now);
 
         // 사용 처리
         foundIssuedCoupon.use(now);
@@ -223,5 +168,84 @@ public class CouponService {
         Coupon coupon = couponRepository.findByIdAndDeletedAtIsNull(couponId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_NOT_FOUND));
         coupon.softDelete();
+    }
+
+    private User getUserOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.USER_NOT_FOUND));
+    }
+
+    private Coupon getCouponOrThrow(Long couponId) {
+        return couponRepository.findByIdAndDeletedAtIsNull(couponId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_NOT_FOUND));
+    }
+
+    // 발급 기간 확인
+    private void validateIssueStartAtAndIssueEndAt(Coupon coupon) {
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(coupon.getIssueStartAt()) || now.isAfter(coupon.getIssueEndAt())) {
+            throw new CustomException(ExceptionCode.COUPON_ISSUE_PERIOD_INVALID);
+        }
+    }
+
+    // 중복 발급 확인
+    private void validateDuplicateIssue(Long userId, Long couponId) {
+        if (issuedCouponHistoryRepository.existsByUser_IdAndCoupon_Id(userId, couponId)) {
+            throw new CustomException(ExceptionCode.COUPON_ALREADY_ISSUED);
+        }
+    }
+
+    // 만료일 계산
+    private LocalDateTime calculateExpiredAt(Coupon coupon, LocalDateTime issuedAt) {
+
+        Integer periodDays = coupon.getUsePeriodDays();
+        LocalDateTime useStartAt = coupon.getUseStartAt();
+        LocalDateTime useEndAt = coupon.getUseEndAt();
+
+        // 발급 후 N일(상대 기간)
+        if (periodDays != null) {
+            // 고정 기간 값이 같이 있으면 정책 오류
+            if (useStartAt != null || useEndAt != null) {
+                throw new CustomException(ExceptionCode.COUPON_POLICY_INVALID);
+            }
+            return issuedAt.plusDays(periodDays);
+        }
+
+        // 고정 기간: start/end 둘 다 있어야 함
+        if (useStartAt == null && useEndAt == null) {
+            throw new CustomException(ExceptionCode.COUPON_POLICY_INVALID);
+        }
+        return useEndAt;
+    }
+
+    // 내 쿠폰인지 조회
+    private IssuedCouponHistory getMyIssuedCouponOrThrow(Long issuedCouponId, Long userId) {
+        return issuedCouponHistoryRepository
+                .findByIdAndUser_IdAndDeletedAtIsNull(issuedCouponId, userId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.ISSUED_COUPON_NOT_FOUND));
+    }
+
+    // 이미 사용한 쿠폰인지 확인
+    private void validateNotUsed(IssuedCouponHistory history) {
+        if (history.getStatus() == IssuedCouponStatus.USED) {
+            throw new CustomException(ExceptionCode.COUPON_ALREADY_USED);
+        }
+    }
+
+    // 만료된 쿠폰
+    private void validateNotExpired(IssuedCouponHistory history, LocalDateTime now) {
+        if (history.getExpiredAt().isBefore(now)) {
+            throw new CustomException(ExceptionCode.COUPON_EXPIRED);
+        }
+    }
+
+    // 사용 시작 전 쿠폰
+    private void validateStarted(IssuedCouponHistory history, LocalDateTime now) {
+
+        LocalDateTime useStartAt = history.getCoupon().getUseStartAt();
+
+        if (useStartAt != null && useStartAt.isAfter(now)) {
+            throw new CustomException(ExceptionCode.COUPON_NOT_STARTED);
+        }
     }
 }
