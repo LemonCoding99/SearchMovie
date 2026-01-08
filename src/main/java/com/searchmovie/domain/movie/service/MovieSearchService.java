@@ -7,8 +7,8 @@ import com.searchmovie.domain.movie.entity.Movie;
 import com.searchmovie.domain.movie.model.response.MovieSearchResponse;
 import com.searchmovie.domain.movie.model.response.SimplePageResponse;
 import com.searchmovie.domain.movie.repository.MovieRepository;
-import com.searchmovie.domain.search.entity.SearchLog;
-import com.searchmovie.domain.search.repository.SearchRepository;
+import com.searchmovie.domain.search.entity.HotKeyword;
+import com.searchmovie.domain.search.repository.HotKeywordRepository;
 import com.searchmovie.domain.user.entity.User;
 import com.searchmovie.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 
@@ -30,7 +29,7 @@ public class MovieSearchService {
 
     private final MovieRepository movieRepository;
     private final UserRepository userRepository;
-    private final SearchRepository searchRepository;  // 나중에 SearchLogRepository로 변경
+    private final HotKeywordRepository hotKeywordRepository;  // 나중에 SearchLogRepository로 변경
     private final MovieSearchCacheService movieSearchCacheService;
 
 
@@ -104,8 +103,8 @@ public class MovieSearchService {
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.MOVIE_NOT_FOUND));
 
-        SearchLog newSearchLog = searchRepository.save(new SearchLog(user, movie, keyword));
+        HotKeyword newHotKeyword = hotKeywordRepository.save(new HotKeyword(user, movie, keyword));
 
-        return MovieSelectCreateResponse.from(newSearchLog);
+        return MovieSelectCreateResponse.from(newHotKeyword);
     }
 }

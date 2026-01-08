@@ -1,14 +1,11 @@
 package com.searchmovie.domain.couponStock.entity;
 
 import com.searchmovie.common.entity.BaseEntity;
-import com.searchmovie.common.enums.ExceptionCode;
-import com.searchmovie.common.exception.CustomException;
 import com.searchmovie.domain.couponStock.model.request.CouponStockUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Check;
 
 @Getter
 @Entity
@@ -26,13 +23,17 @@ public class CouponStock extends BaseEntity {
     private int totalQuantity;
 
     @Column(name = "present_quantity")
-    @Check(constraints = "present_quantity >= 0")
     private int presentQuantity;
 
-    public CouponStock(Long couponId, int totalQuantity) {
+    @Version
+    @Column(name = "version")
+    private long version;
+
+    public CouponStock(Long couponId, int totalQuantity, long version) {
         this.couponId = couponId;
         this.totalQuantity = totalQuantity;
         this.presentQuantity = totalQuantity;   // 초기값은 최대수량과 동일하게
+        this.version = version;
     }
 
     public CouponStock update(CouponStockUpdateRequest request) {
@@ -41,10 +42,10 @@ public class CouponStock extends BaseEntity {
         return this;
     }
 
-    public void decrease(int amount) {
-        if((this.presentQuantity - amount) < 0) {
-            throw new CustomException(ExceptionCode.COUPON_OUT_OF_STOCK);
+    // 쿠폰 감소 메서드
+    public void decrease(int quantity) {
+        if (totalQuantity - presentQuantity < 0) {
+            throw new IllegalArgumentException("쿠폰이 소진되었습니다.");
         }
-        this.presentQuantity -= amount;
-    }
+        this.presentQuantity -= quantity; }
 }

@@ -1,6 +1,6 @@
 package com.searchmovie.domain.movie.model.response;
 
-import com.searchmovie.domain.search.entity.SearchLog;
+import com.searchmovie.domain.search.entity.HotKeyword;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,15 +15,15 @@ public class MovieSelectCreateResponse {
     private final String keyword;
     private final LocalDateTime searchedAt;
 
-    public static MovieSelectCreateResponse from(SearchLog searchLog) {
+    public static MovieSelectCreateResponse from(HotKeyword hotKeyword) {
         return new MovieSelectCreateResponse(
-                searchLog.getId(),
-                searchLog.getUserId(),
-                searchLog.getMovieId(),
-//                searchLog.getUser().getId(),
-//                searchLog.getMovie().getId(),
-                searchLog.getKeyword(),
-                searchLog.getSearchedAt()
+                hotKeyword.getId(),
+                hotKeyword.getUserId(),
+                hotKeyword.getMovieId(),
+//                hotKeyword.getUser().getId(),
+//                hotKeyword.getMovie().getId(),
+                hotKeyword.getKeyword(),
+                hotKeyword.getSearchedAt()
         );
     }
 }

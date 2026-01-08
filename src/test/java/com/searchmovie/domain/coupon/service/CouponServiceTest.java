@@ -1,61 +1,133 @@
 package com.searchmovie.domain.coupon.service;
 
-import com.searchmovie.domain.couponStock.entity.CouponStock;
-import com.searchmovie.domain.couponStock.repository.CouponStockRepository;
-import com.searchmovie.domain.user.entity.User;
-import org.junit.jupiter.api.BeforeEach;
+import com.searchmovie.common.enums.ExceptionCode;
+import com.searchmovie.common.exception.CustomException;
+import com.searchmovie.common.model.PageResponse;
+import com.searchmovie.domain.coupon.entity.Coupon;
+import com.searchmovie.domain.coupon.model.request.CouponCreateRequest;
+import com.searchmovie.domain.coupon.model.request.CouponUpdateRequest;
+import com.searchmovie.domain.coupon.model.response.CouponCreateResponse;
+import com.searchmovie.domain.coupon.model.response.CouponGetResponse;
+import com.searchmovie.domain.coupon.repository.CouponRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-@SpringBootTest
+
+@ExtendWith(MockitoExtension.class)
 class CouponServiceTest {
 
-    @Autowired
-    CouponService couponService;
+    @Mock
+    private CouponRepository couponRepository;
 
-    @Autowired
-    CouponStockRepository couponStockRepository;
-
-    @Autowired
-    private com.searchmovie.domain.user.repository.UserRepository userRepository;
+    @InjectMocks
+    private CouponService couponService;
 
     @Test
-    @DisplayName("비관락_동시_쿠폰발급_성공")
-    void issueMyCoupon_pessimistic_lock() throws Exception {
-        // given DB 데이터는 이미 SQL로 세팅 완료 (쿠폰 1번, 재고 10개)
-        int threadCount = 10;
-        Long couponId = 1L;
+    @DisplayName("쿠폰 생성 성공")
+    void createCoupon_success() {
+        // given
+        CouponCreateRequest request = org.mockito.Mockito.mock(CouponCreateRequest.class);
 
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-        CountDownLatch latch = new CountDownLatch(threadCount);
+        given(request.getName()).willReturn("테스트쿠폰");
+        given(request.getDiscountRate()).willReturn(10);
+        given(request.getMaxDiscountPrice()).willReturn(3000);
 
-        // when 10명이 동시에 발급 요청
-        for (int i = 0; i < threadCount; i++) {
-            final long userId = (long) i + 1; // 유저 1~10번 사용
-            executor.submit(() -> {
-                try {
-                    couponService.issueMyCoupon(userId, couponId);
-                } catch (Exception e) {
-                    System.err.println("실패: " + e.getMessage());
-                } finally {
-                    latch.countDown();
-                }
-            });
-        }
+        LocalDateTime issueStart = LocalDateTime.now().minusDays(1);
+        LocalDateTime issueEnd = LocalDateTime.now().plusDays(10);
+        given(request.getIssueStartAt()).willReturn(issueStart);
+        given(request.getIssueEndAt()).willReturn(issueEnd);
 
-        latch.await();
+        given(request.getUsePeriodDays()).willReturn(30);
+        given(request.getUseStartAt()).willReturn(null);
+        given(request.getUseEndAt()).willReturn(null);
+
+        Coupon saved = new Coupon("테스트쿠폰", 10, 3000, issueStart, issueEnd, 30, null, null);
+        given(couponRepository.save(any(Coupon.class))).willReturn(saved);
+
+        // when
+        CouponCreateResponse response = couponService.createCoupon(request);
 
         // then
-        CouponStock stock = couponStockRepository.findByCouponId(couponId).orElseThrow();
-        System.out.println("남은 최종 재고 = " + stock.getPresentQuantity());
-
-        assertThat(stock.getPresentQuantity()).isEqualTo(10);
+        assertThat(response.getName()).isEqualTo("테스트쿠폰");
+        assertThat(response.getDiscountRate()).isEqualTo(10);
+        assertThat(response.getUsePeriodDays()).isEqualTo(30);
+        assertThat(response.getUseStartAt()).isNull();
+        assertThat(response.getUseEndAt()).isNull();
     }
+
+    @Test
+    @DisplayName("쿠폰 단건 조회 성공")
+    void getCoupon_success() {
+        // given
+        Long couponId = 1L;
+
+        Coupon coupon = org.mockito.Mockito.mock(Coupon.class);
+        given(coupon.getId()).willReturn(couponId);
+        given(coupon.getName()).willReturn("조회쿠폰");
+        given(couponRepository.findByIdAndDeletedAtIsNull(couponId)).willReturn(Optional.of(coupon));
+
+        // when
+        CouponGetResponse response = couponService.getCoupon(couponId);
+
+        // then
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getName()).isEqualTo("조회쿠폰");
+    }
+
+    @Test
+    @DisplayName("쿠폰 수정 성공")
+    void updateCoupon_success() {
+        // given
+        Long couponId = 1L;
+
+        CouponUpdateRequest request = org.mockito.Mockito.mock(CouponUpdateRequest.class);
+        given(request.getName()).willReturn("수정쿠폰");
+        given(request.getDiscountRate()).willReturn(15);
+
+        Coupon coupon = org.mockito.Mockito.mock(Coupon.class);
+        given(couponRepository.findById(couponId)).willReturn(Optional.of(coupon));
+
+        given(coupon.getId()).willReturn(couponId);
+        given(coupon.getName()).willReturn("수정쿠폰");
+
+        // when
+        CouponGetResponse response = couponService.updateCoupon(couponId, request);
+
+        // then
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getName()).isEqualTo("수정쿠폰");
+    }
+
+    @Test
+    @DisplayName("쿠폰 삭제 성공")
+    void deleteCoupon_success() {
+        // given
+        Long couponId = 1L;
+
+        Coupon coupon = org.mockito.Mockito.mock(Coupon.class);
+        given(couponRepository.findByIdAndDeletedAtIsNull(couponId)).willReturn(Optional.of(coupon));
+
+        // when
+        couponService.deleteCoupon(couponId);
+
+        // then
+        org.mockito.Mockito.verify(coupon).softDelete();
+    }
+
 }

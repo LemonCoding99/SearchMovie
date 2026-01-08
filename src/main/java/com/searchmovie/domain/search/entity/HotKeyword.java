@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @Table(name = "search_logs")
-public class SearchLog {
+public class HotKeyword {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class SearchLog {
     @Column(name = "searched_at", nullable = false)
     private LocalDateTime searchedAt;
 
-    public SearchLog(User user, Movie movie, String keyword) {
+    public HotKeyword(User user, Movie movie, String keyword) {
         this.userId = user.getId();
         this.movieId = movie.getId();
         this.keyword = keyword;
