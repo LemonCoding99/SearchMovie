@@ -1,11 +1,11 @@
 package com.searchmovie.domain.search.controller;
 
-import com.searchmovie.common.exception.SearchException;
+import com.searchmovie.common.exception.CustomException;
 import com.searchmovie.common.model.CommonResponse;
-import com.searchmovie.domain.search.model.response.GenreKeywordResponse;
-import com.searchmovie.domain.search.model.response.HotKeywordResponse;
-import com.searchmovie.domain.search.model.request.PeriodSearchRequest;
-import com.searchmovie.domain.search.model.response.PeriodSearchResponse;
+import com.searchmovie.domain.search.model.request.PeriodRankRequest;
+import com.searchmovie.domain.search.model.response.GenreRankResponse;
+import com.searchmovie.domain.search.model.response.PeriodRankListResponse;
+import com.searchmovie.domain.search.model.response.SynthesisRankResponse;
 import com.searchmovie.domain.search.service.HotKeywordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,103 +28,89 @@ public class HotKeywordController {
 
     private final HotKeywordService hotKeywordService;
 
+    // ==================================================
+    // V1 (캐싱 미적용)
+    // ==================================================
 
-    /**
-     * 종합 인기검색어 TOP 10 (V1)
-     */
+    //종합 인기검색어 TOP 10
     @GetMapping("/v1/movies/hot-keywords/synthesis")
-    public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> v1synthesis() {
-        List<HotKeywordResponse> response = hotKeywordService.v1topSynthesis();
+    public ResponseEntity<CommonResponse<List<SynthesisRankResponse>>> v1synthesis() {
+        List<SynthesisRankResponse> response = hotKeywordService.v1SynthesisRanking();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "종합 인기 검색어 조회 성공", response));
     }
 
 
-    /**
-     * 장르별 인기검색어 TOP 10 (V1)
-     */
+    //장르별 인기검색어 TOP 10
     @GetMapping("/v1/movies/hot-keywords/genre")
-    public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> v1genre() {
-        List<GenreKeywordResponse> response = hotKeywordService.v1topGenre();
+    public ResponseEntity<CommonResponse<List<GenreRankResponse>>> v1genre() {
+        List<GenreRankResponse> response = hotKeywordService.v1GenreRanking();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "장르별 인기 검색어 조회 성공", response));
     }
 
-
-    /**
-     * 월간 인기검색어 TOP 10 (V1)
-     */
+    //월간 인기검색어 TOP 10
     @GetMapping("/v1/movies/hot-keywords/period")
-    public ResponseEntity<CommonResponse<PeriodSearchResponse>> v1period(@RequestParam(required = false) Integer year,
-                                                                         @RequestParam(required = false) Integer month) {
-
+    public ResponseEntity<CommonResponse<PeriodRankListResponse>> v1Period(@RequestParam(required = false) Integer year,
+                                                                           @RequestParam(required = false) Integer month) {
         int resolvedYear = (year == null) ? LocalDate.now().getYear() : year;
         int resolvedMonth = (month == null) ? LocalDate.now().getMonthValue() : month;
 
-
         if (resolvedYear < 1900 || resolvedYear > 2100) {
-            throw new SearchException(INVALID_SEARCH_PERIOD);
+            throw new CustomException(INVALID_SEARCH_PERIOD);
         }
         if (resolvedMonth < 1 || resolvedMonth > 12) {
-            throw new SearchException(INVALID_MONTH);
+            throw new CustomException(INVALID_MONTH);
         }
 
-        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(resolvedYear, resolvedMonth);
-        PeriodSearchResponse response = hotKeywordService.v1topPeriod(periodSearchRequest);
+        PeriodRankRequest periodRankRequest = new PeriodRankRequest(resolvedYear, resolvedMonth);
+        PeriodRankListResponse response = hotKeywordService.v1PeriodRanking(periodRankRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "월간 인기 검색어 조회 성공", response));
     }
-
 
     // ==================================================
     // V2 (Spring 캐시 적용)
     // ==================================================
 
-    /**
-     * 종합 인기검색어 TOP 10 (V2 - 캐시)
-     */
+    //종합 인기검색어 TOP 10
     @GetMapping("/v2/movies/hot-keywords/synthesis")
-    public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> v2synthesis() {
-        List<HotKeywordResponse> response = hotKeywordService.v2topSynthesis();
+    public ResponseEntity<CommonResponse<List<SynthesisRankResponse>>> v2synthesis() {
+        List<SynthesisRankResponse> response = hotKeywordService.v2SynthesisRanking();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "종합 인기 검색어 조회 성공", response));
     }
 
-    /**
-     * 장르별 인기검색어 TOP 10 (V2 - 캐시)
-     */
+    //장르별 인기검색어 TOP 10
     @GetMapping("/v2/movies/hot-keywords/genre")
-    public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> v2genre() {
-        List<GenreKeywordResponse> response = hotKeywordService.v2topGenre();
+    public ResponseEntity<CommonResponse<List<GenreRankResponse>>> v2genre() {
+        List<GenreRankResponse> response = hotKeywordService.v2GenreRanking();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "장르별 인기 검색어 조회 성공", response));
     }
 
-    /**
-     * 월간 인기검색어 TOP 10 (V2 - 캐시)
-     */
+    //월간 인기검색어 TOP 10
     @GetMapping("/v2/movies/hot-keywords/period")
-    public ResponseEntity<CommonResponse<PeriodSearchResponse>> v2period(@RequestParam(required = false) Integer year,
-                                                                         @RequestParam(required = false) Integer month) {
+    public ResponseEntity<CommonResponse<PeriodRankListResponse>> v2period(@RequestParam(required = false) Integer year,
+                                                                           @RequestParam(required = false) Integer month) {
         int resolvedYear = (year == null) ? LocalDate.now().getYear() : year;
         int resolvedMonth = (month == null) ? LocalDate.now().getMonthValue() : month;
 
-
-        if (resolvedYear < 1900 || resolvedYear > 2100) {
-            throw new SearchException(INVALID_SEARCH_PERIOD);
+        if (resolvedYear < 2017 || resolvedYear > 2020) {
+            throw new CustomException(INVALID_SEARCH_PERIOD);
         }
         if (resolvedMonth < 1 || resolvedMonth > 12) {
-            throw new SearchException(INVALID_MONTH);
+            throw new CustomException(INVALID_MONTH);
         }
 
-        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(resolvedYear, resolvedMonth);
-        PeriodSearchResponse response = hotKeywordService.v2topPeriod(periodSearchRequest);
+        PeriodRankRequest periodRankRequest = new PeriodRankRequest(resolvedYear, resolvedMonth);
+        PeriodRankListResponse response = hotKeywordService.v2PeriodRanking(periodRankRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -133,50 +119,43 @@ public class HotKeywordController {
 
 
     // ==================================================
-    // V3 (Redis)
+    // V3 (Redis 캐시 적용)
     // ==================================================
 
-    /**
-     * 종합 인기검색어 TOP 10 (V3 - 캐시)
-     */
+    //종합 인기검색어 TOP 10
     @GetMapping("/v3/movies/hot-keywords/synthesis")
-    public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> v3synthesis() {
-        List<HotKeywordResponse> response = hotKeywordService.v3topSynthesis();
+    public ResponseEntity<CommonResponse<List<SynthesisRankResponse>>> v3synthesis() {
+        List<SynthesisRankResponse> response = hotKeywordService.v3SynthesisRanking();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "종합 인기 검색어 조회 성공", response));
     }
 
-    /**
-     * 장르별 인기검색어 TOP 10 (V3 - 캐시)
-     */
+    //장르별 인기검색어 TOP 10
     @GetMapping("/v3/movies/hot-keywords/genre")
-    public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> v3genre() {
-        List<GenreKeywordResponse> response = hotKeywordService.v3topGenre();
+    public ResponseEntity<CommonResponse<List<GenreRankResponse>>> v3genre() {
+        List<GenreRankResponse> response = hotKeywordService.v3GenreRanking();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "장르별 인기 검색어 조회 성공", response));
     }
 
-    /**
-     * 월간 인기검색어 TOP 10 (V3 - 캐시)
-     */
+    //월간 인기검색어 TOP 10
     @GetMapping("/v3/movies/hot-keywords/period")
-    public ResponseEntity<CommonResponse<PeriodSearchResponse>> v3period(@RequestParam(required = false) Integer year,
-                                                                         @RequestParam(required = false) Integer month) {
-
+    public ResponseEntity<CommonResponse<PeriodRankListResponse>> v3period(@RequestParam(required = false) Integer year,
+                                                                           @RequestParam(required = false) Integer month) {
         int resolvedYear = (year == null) ? LocalDate.now().getYear() : year;
         int resolvedMonth = (month == null) ? LocalDate.now().getMonthValue() : month;
 
         if (resolvedYear < 1900 || resolvedYear > 2100) {
-            throw new SearchException(INVALID_SEARCH_PERIOD);
+            throw new CustomException(INVALID_SEARCH_PERIOD);
         }
         if (resolvedMonth < 1 || resolvedMonth > 12) {
-            throw new SearchException(INVALID_MONTH);
+            throw new CustomException(INVALID_MONTH);
         }
 
-        PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(resolvedYear, resolvedMonth);
-        PeriodSearchResponse response = hotKeywordService.v3topPeriod(periodSearchRequest);
+        PeriodRankRequest periodRankRequest = new PeriodRankRequest(resolvedYear, resolvedMonth);
+        PeriodRankListResponse response = hotKeywordService.v3PeriodRanking(periodRankRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

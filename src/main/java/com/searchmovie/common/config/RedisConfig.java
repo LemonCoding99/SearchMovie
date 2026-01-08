@@ -21,8 +21,6 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // 추가 Java 8에서 추가된 LocalDate, LocalDateTime을 커버하기 위한 설정
-        // ObjectMapper 커스터마이징
         ObjectMapper mapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
