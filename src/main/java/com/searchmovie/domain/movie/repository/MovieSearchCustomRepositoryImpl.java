@@ -46,9 +46,9 @@ public class MovieSearchCustomRepositoryImpl implements MovieSearchCustomReposit
                         genreContains(genreKeyword)
                 )
                 .distinct()  // 중복 조회 방지
-                .orderBy(movie.id.desc())  // 이름 기준 조회로 수정 고려해보기➕
-                .offset(pageable.getOffset())  // page * size 개수만큼 건너뛰기
-                .limit(pageable.getPageSize())
+                .orderBy(movie.id.desc())
+                .offset(pageable.getOffset())  // 건너뛸 데이터 개수 지정
+                .limit(pageable.getPageSize())  // 조회할 데이터 최대 개수 지정
                 .fetch();
 
         // 전체 개수 조회(Page)

@@ -74,23 +74,29 @@ public class MovieService {
     // 영화 단건 조회
     @Transactional(readOnly = true)
     public MovieGetResponse getMovie(Long id) {
+        // 영화 존재여부 확인
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionCode.MOVIE_NOT_FOUND));
 
+        // 해당 영화 장르 조회
         List<MovieGenre> movieGenreList = movieGenreRepository.findAllByMovieId(id);
 
+        // 매핑으로 장르 id 뽑기
         List<Long> genreIdList = new ArrayList<>(movieGenreList.size());
         for (MovieGenre movieGenre : movieGenreList) {
             genreIdList.add(movieGenre.getGenreId());
         }
 
+        // 뽑은 id로 조회
         List<Genre> genres = genreIdList.isEmpty()
                 ? List.of()
                 : genreRepository.findAllById(genreIdList);
 
+        // 응답
         return MovieGetResponse.of(movie, genres);
     }
 
+    // 영화 전체조회
     @Transactional(readOnly = true)
     public PageResponse<MovieGetResponse> getMovies(Pageable pageable) {
 
@@ -104,6 +110,7 @@ public class MovieService {
             movieIds.add(movie.getId());
         }
 
+        // 장르 매핑을 위해 맵 생성
         Map<Long, List<Genre>> genresByMovieId = new HashMap<>();
 
         // 영화가 없으면 날리지않음
@@ -116,6 +123,7 @@ public class MovieService {
                 genreIds.add(movieGenre.getGenreId());
             }
 
+            // 장르 조회 후 그 id를 변환
             Map<Long, Genre> genreById = new HashMap<>();
             if (!genreIds.isEmpty()) {
                 List<Genre> genres = genreRepository.findAllById(genreIds);
@@ -124,6 +132,7 @@ public class MovieService {
                 }
             }
 
+            // 장르 채우기
             for (MovieGenre movieGenre : mappings) {
                 Genre genre = genreById.get(movieGenre.getGenreId());
                 if (genre == null) continue;
@@ -134,26 +143,30 @@ public class MovieService {
         }
 
         Page<MovieGetResponse> dtoPage = moviePage.map(movie -> {
-            List<Genre> gs = genresByMovieId.get(movie.getId());
-            if (gs == null) gs = List.of();
-            return MovieGetResponse.of(movie, gs);
+            List<Genre> genres = genresByMovieId.get(movie.getId());
+            if (genres == null) genres = List.of();
+            return MovieGetResponse.of(movie, genres);
         });
 
         return PageResponse.from(dtoPage);
     }
 
+    // 영화 수정
     @Transactional
     public MovieGetResponse updateMovie(Long id, MovieUpdateRequest request) {
 
+        // 영화 조회
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionCode.MOVIE_NOT_FOUND));
 
+        // null 이면 수정x null아니면 공백 제거
         String title = request.getTitle();
         if (title != null) {
             if (title.isBlank()) throw new CustomException(ExceptionCode.INVALID_MOVIE_TITLE);
             title = title.trim();
         }
 
+        // null 이면 수정x null아니면 공백 제거
         String director = request.getDirector();
         if (director != null) {
             if (director.isBlank()) throw new CustomException(ExceptionCode.INVALID_MOVIE_DIRECTOR);
@@ -165,6 +178,7 @@ public class MovieService {
         List<String> rawGenres = request.getGenres();
         List<Genre> resultGenres;
 
+        // null이여서 미수정 경우
         if (rawGenres == null) {
             List<MovieGenre> movieGenreList = movieGenreRepository.findAllByMovieId(id);
 
@@ -176,14 +190,16 @@ public class MovieService {
             resultGenres = genreIdList.isEmpty()
                     ? List.of()
                     : genreRepository.findAllById(genreIdList);
-
+        // 수정할 경우
         } else {
             List<String> normalized = genreNormalizer.normalize(rawGenres);
 
+            // 의미없는 값 줬을 경우 예외처리
             if (!rawGenres.isEmpty() && normalized.isEmpty()) {
                 throw new CustomException(ExceptionCode.INVALID_GENRE_NAME);
             }
 
+            // 디비에 정규화된 장르(재사용 또는 생성위해)
             List<Genre> genres = new ArrayList<>(normalized.size());
             for (String name : normalized) {
                 if (name == null || name.isBlank()) {
@@ -192,24 +208,32 @@ public class MovieService {
                 genres.add(findOrCreateGenre(name));
             }
 
+            // 기존 매핑되어있던 장르id 삭제
             movieGenreRepository.deleteAllByMovieId(id);
 
+            // 삭제 후 재삽입
             List<MovieGenre> mappings = new ArrayList<>(genres.size());
             for (Genre genre : genres) {
                 mappings.add(new MovieGenre(id, genre.getId()));
             }
             movieGenreRepository.saveAll(mappings);
 
+            // 새로운 장르들
             resultGenres = genres;
         }
 
+        // 응답
         return MovieGetResponse.of(movie, resultGenres);
     }
 
+    // 영화 삭제
     @Transactional
     public void deleteMovie(Long id) {
+        // 존재확인
         movieRepository.findById(id).orElseThrow(() -> new CustomException(ExceptionCode.MOVIE_NOT_FOUND));
+        // 장르 먼저 삭제
         movieGenreRepository.deleteAllByMovieId(id);
+        // 영화 삭제
         movieRepository.deleteById(id);
     }
 }
