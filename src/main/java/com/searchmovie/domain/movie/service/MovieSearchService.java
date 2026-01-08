@@ -19,7 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 
@@ -44,16 +43,17 @@ public class MovieSearchService {
         return SimplePageResponse.from(response);
     }
 
+
     // 영화 전체 검색(캐시 사용한 V2)
     @Transactional(readOnly = true)
     @Cacheable(
             value = "searchCache",
             // 공백제거, 문자열 처리
             key = "'movieSearch:'"
-                    + " + 'title=' + (#title == null ? '' : #title.trim())"
+                    + " + 'title=' + (#title == null ? '' : #title.trim())"  // null일 경우 빈 문자열, 아닐 경우 앞뒤 공백 제거
                     + " + '|director=' + (#director == null ? '' : #director.trim())"
                     + " + '|genre=' + (#genreKeyword == null ? '' : #genreKeyword.trim())"
-                    + " + '|start=' + (#releaseDateStart == null ? '' : #releaseDateStart.toString())"
+                    + " + '|start=' + (#releaseDateStart == null ? '' : #releaseDateStart.toString())"  // 날짜 문자열 전환
                     + " + '|end=' + (#releaseDateEnd == null ? '' : #releaseDateEnd.toString())"
                     + " + '|page=' + #page"
                     + " + '|size=' + #size"
@@ -66,12 +66,13 @@ public class MovieSearchService {
         return SimplePageResponse.from(response);
     }
 
+
     // 영화 전체 검색(Redis 캐시 사용한 V3)
     @Transactional(readOnly = true)
     public SimplePageResponse<MovieSearchResponse> searchMovie3(String title, String director, String genreKeyword, LocalDate releaseDateStart, LocalDate releaseDateEnd, int page, int size) {
+
         // 1. 캐시가 있나요?
-        SimplePageResponse<MovieSearchResponse> cached =
-                movieSearchCacheService.getSearchCache(title, director, genreKeyword, releaseDateStart, releaseDateEnd, page, size);
+        SimplePageResponse<MovieSearchResponse> cached = movieSearchCacheService.getSearchCache(title, director, genreKeyword, releaseDateStart, releaseDateEnd, page, size);
         if (cached != null) {
             log.info(" Redis Search Cache Hit ");
             return cached;
@@ -92,17 +93,18 @@ public class MovieSearchService {
 
     // 영화 검색 로그 생성
     @Transactional
-//    @Cacheable(value = "searchCache", key = "'movie:' + #movieId")  // 같은 movieId일 경우 캐시 저장되어 빨리 가져옴(로컬캐시)
+    // @Cacheable(value = "searchCache", key = "'movie:' + #movieId")  // 같은 movieId일 경우 캐시 저장되어 빨리 가져옴(로컬캐시)
     public MovieSelectCreateResponse createSelect(String keyword, Long userId, Long movieId) {
 
+        // 키워드를 입력하지 않은 경우 예외처리
         if (keyword == null || keyword.trim().isEmpty()) {
             throw new CustomException(ExceptionCode.SEARCH_KEYWORD_REQUIRED);
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.USER_NOT_FOUND));
-        Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.MOVIE_NOT_FOUND));
+        // 유저Id를 찾을 수 없는 경우 예외처리
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ExceptionCode.USER_NOT_FOUND));
+        // 영화Id를 찾을 수 없는 경우 예외처리
+        Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new CustomException(ExceptionCode.MOVIE_NOT_FOUND));
 
         SearchLog newSearchLog = searchRepository.save(new SearchLog(user, movie, keyword));
 
