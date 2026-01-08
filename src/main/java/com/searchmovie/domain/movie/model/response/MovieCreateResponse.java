@@ -27,13 +27,6 @@ public class MovieCreateResponse {
             names.add(g.getName());
         }
 
-        return new MovieCreateResponse(
-                movie.getId(),
-                movie.getTitle(),
-                movie.getDirector(),
-                movie.getReleaseDate(),
-                names,
-                movie.getCreatedAt()
-        );
+        return new MovieCreateResponse(movie.getId(), movie.getTitle(), movie.getDirector(), movie.getReleaseDate(), names, movie.getCreatedAt());
     }
 }

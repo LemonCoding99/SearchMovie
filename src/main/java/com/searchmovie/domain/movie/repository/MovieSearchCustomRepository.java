@@ -9,10 +9,5 @@ import java.time.LocalDate;
 public interface MovieSearchCustomRepository {
 
     // 영화 검색 기능
-    Page<MovieSearchResponse> search(String title,
-                                     String director,
-                                     String genreKeyword,
-                                     LocalDate releaseDateStart,
-                                     LocalDate releaseDateEnd,
-                                     Pageable pageable);
+    Page<MovieSearchResponse> search(String title, String director, String genreKeyword, LocalDate releaseDateStart, LocalDate releaseDateEnd, Pageable pageable);
 }
