@@ -21,6 +21,7 @@ public class MovieController {
 
     private final MovieService movieService;
 
+    // 영화 생성
     @PostMapping("/auth/movies")
     public ResponseEntity<CommonResponse<MovieCreateResponse>> createMovie(@Valid @RequestBody MovieCreateRequest request) {
         MovieCreateResponse response = movieService.createMovie(request);
@@ -28,6 +29,7 @@ public class MovieController {
         return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
     }
 
+    // 영화 단건조회
     @GetMapping("/movies/{id}")
     public ResponseEntity<CommonResponse<MovieGetResponse>> getMovie(@PathVariable Long id) {
         MovieGetResponse response = movieService.getMovie(id);
@@ -35,6 +37,7 @@ public class MovieController {
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
+    // 영화 전체조회
     @GetMapping("/movies")
     public ResponseEntity<CommonResponse<PageResponse<MovieGetResponse>>> getMovies(Pageable pageable) {
         PageResponse<MovieGetResponse> response = movieService.getMovies(pageable);
@@ -42,15 +45,17 @@ public class MovieController {
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
+    // 영화 수정
     @PutMapping("/auth/movies/{id}")
     public ResponseEntity<CommonResponse<MovieGetResponse>> updateMovie(
             @PathVariable Long id,
-            @RequestBody MovieUpdateRequest request
+            @Valid @RequestBody MovieUpdateRequest request
     ) {
         MovieGetResponse response = movieService.updateMovie(id, request);
         return ResponseEntity.ok(new CommonResponse<>(true, "영화 수정 성공", response));
     }
 
+    // 영화 삭제
     @DeleteMapping("/auth/movies/{id}")
     public ResponseEntity<CommonResponse<Void>> deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);
