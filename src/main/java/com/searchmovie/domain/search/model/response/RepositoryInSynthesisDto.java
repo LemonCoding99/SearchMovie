@@ -7,13 +7,12 @@ import java.time.LocalDate;
 
 @Getter
 @RequiredArgsConstructor
-public class SearchKeywordResponse {
+public class RepositoryInSynthesisDto {
+
     private final String keyword;
     private final String title;
     private final String genre;
     private final String director;
     private final LocalDate releaseDate;
     private final Long score;
-
-
 }

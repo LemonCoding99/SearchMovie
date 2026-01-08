@@ -20,7 +20,7 @@ public class CouponCoreService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void withdraw(Long couponId, int quantity) {
-        CouponStock stock = couponStockRepository.findByCouponId(couponId)
+        CouponStock stock = couponStockRepository.findByCouponIdAndDeletedAtIsNull(couponId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.COUPON_STOCK_NOT_FOUND));
 
         try {

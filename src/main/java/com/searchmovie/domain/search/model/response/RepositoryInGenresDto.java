@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class SearchGenresResponse {
+public class RepositoryInGenresDto {
     private final String genre;
     private final Long score;
 }
