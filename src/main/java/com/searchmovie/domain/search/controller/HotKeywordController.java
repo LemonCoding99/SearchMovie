@@ -6,7 +6,7 @@ import com.searchmovie.domain.search.model.response.GenreKeywordResponse;
 import com.searchmovie.domain.search.model.response.HotKeywordResponse;
 import com.searchmovie.domain.search.model.request.PeriodSearchRequest;
 import com.searchmovie.domain.search.model.response.PeriodSearchResponse;
-import com.searchmovie.domain.search.service.SearchService;
+import com.searchmovie.domain.search.service.HotKeywordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ import static com.searchmovie.common.enums.ExceptionCode.INVALID_SEARCH_PERIOD;
 @RequestMapping("/api")
 public class HotKeywordController {
 
-    private final SearchService searchService;
+    private final HotKeywordService hotKeywordService;
 
 
     /**
@@ -34,7 +34,7 @@ public class HotKeywordController {
      */
     @GetMapping("/v1/movies/hot-keywords/synthesis")
     public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> v1synthesis() {
-        List<HotKeywordResponse> response = searchService.v1topSynthesis();
+        List<HotKeywordResponse> response = hotKeywordService.v1topSynthesis();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "종합 인기 검색어 조회 성공", response));
@@ -46,7 +46,7 @@ public class HotKeywordController {
      */
     @GetMapping("/v1/movies/hot-keywords/genre")
     public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> v1genre() {
-        List<GenreKeywordResponse> response = searchService.v1topGenre();
+        List<GenreKeywordResponse> response = hotKeywordService.v1topGenre();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "장르별 인기 검색어 조회 성공", response));
@@ -72,7 +72,7 @@ public class HotKeywordController {
         }
 
         PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(resolvedYear, resolvedMonth);
-        PeriodSearchResponse response = searchService.v1topPeriod(periodSearchRequest);
+        PeriodSearchResponse response = hotKeywordService.v1topPeriod(periodSearchRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -89,7 +89,7 @@ public class HotKeywordController {
      */
     @GetMapping("/v2/movies/hot-keywords/synthesis")
     public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> v2synthesis() {
-        List<HotKeywordResponse> response = searchService.v2topSynthesis();
+        List<HotKeywordResponse> response = hotKeywordService.v2topSynthesis();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "종합 인기 검색어 조회 성공", response));
@@ -100,7 +100,7 @@ public class HotKeywordController {
      */
     @GetMapping("/v2/movies/hot-keywords/genre")
     public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> v2genre() {
-        List<GenreKeywordResponse> response = searchService.v2topGenre();
+        List<GenreKeywordResponse> response = hotKeywordService.v2topGenre();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "장르별 인기 검색어 조회 성공", response));
@@ -124,7 +124,7 @@ public class HotKeywordController {
         }
 
         PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(resolvedYear, resolvedMonth);
-        PeriodSearchResponse response = searchService.v2topPeriod(periodSearchRequest);
+        PeriodSearchResponse response = hotKeywordService.v2topPeriod(periodSearchRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -141,7 +141,7 @@ public class HotKeywordController {
      */
     @GetMapping("/v3/movies/hot-keywords/synthesis")
     public ResponseEntity<CommonResponse<List<HotKeywordResponse>>> v3synthesis() {
-        List<HotKeywordResponse> response = searchService.v3topSynthesis();
+        List<HotKeywordResponse> response = hotKeywordService.v3topSynthesis();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "종합 인기 검색어 조회 성공", response));
@@ -152,14 +152,14 @@ public class HotKeywordController {
      */
     @GetMapping("/v3/movies/hot-keywords/genre")
     public ResponseEntity<CommonResponse<List<GenreKeywordResponse>>> v3genre() {
-        List<GenreKeywordResponse> response = searchService.v3topGenre();
+        List<GenreKeywordResponse> response = hotKeywordService.v3topGenre();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new CommonResponse<>(true, "장르별 인기 검색어 조회 성공", response));
     }
 
     /**
-     * 월간 인기검색어 TOP 10 (V2 - 캐시)
+     * 월간 인기검색어 TOP 10 (V3 - 캐시)
      */
     @GetMapping("/v3/movies/hot-keywords/period")
     public ResponseEntity<CommonResponse<PeriodSearchResponse>> v3period(@RequestParam(required = false) Integer year,
@@ -176,7 +176,7 @@ public class HotKeywordController {
         }
 
         PeriodSearchRequest periodSearchRequest = new PeriodSearchRequest(resolvedYear, resolvedMonth);
-        PeriodSearchResponse response = searchService.v3topPeriod(periodSearchRequest);
+        PeriodSearchResponse response = hotKeywordService.v3topPeriod(periodSearchRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

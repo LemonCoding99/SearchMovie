@@ -5,7 +5,7 @@ import com.searchmovie.domain.search.model.response.GenreKeywordResponse;
 import com.searchmovie.domain.search.model.response.HotKeywordResponse;
 import com.searchmovie.domain.search.model.response.PeriodKeywordResponse;
 import com.searchmovie.domain.search.model.response.PeriodSearchResponse;
-import com.searchmovie.domain.search.repository.SearchRepository;
+import com.searchmovie.domain.search.repository.HotKeywordRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,17 +20,17 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SearchService {
+public class HotKeywordService {
 
-    private final SearchRepository searchRepository;
-    private final SearchCacheService searchCacheService;
+    private final HotKeywordRepository hotKeywordRepository;
+    private final HotKeywordCacheService hotKeywordCacheService;
 
     /**
      * 종합 인기검색어 TOP 10
      */
     @Transactional
     public List<HotKeywordResponse> v1topSynthesis() {
-        return searchRepository.findTopKeywords();
+        return hotKeywordRepository.findTopKeywords();
     }
 
 
@@ -39,7 +39,7 @@ public class SearchService {
      */
     @Transactional
     public List<GenreKeywordResponse> v1topGenre() {
-        return searchRepository.findTopGenres();
+        return hotKeywordRepository.findTopGenres();
     }
 
 
@@ -54,7 +54,7 @@ public class SearchService {
         LocalDateTime from = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime to = yearMonth.plusMonths(1).atDay(1).atStartOfDay();
 
-        List<PeriodKeywordResponse> periodKeywords = searchRepository.findTopPeriod(from, to);
+        List<PeriodKeywordResponse> periodKeywords = hotKeywordRepository.findTopPeriod(from, to);
 
         return new PeriodSearchResponse(
                 yearMonth.toString(),
@@ -69,14 +69,14 @@ public class SearchService {
     @Cacheable(value = "searchMovie", key = "'v2synthesis'", sync = true)
     public List<HotKeywordResponse> v2topSynthesis() {
         log.info("[CACHE_MISS] v2topSynthesis-> key=overall (DB hit)");
-        return searchRepository.findTopKeywords();
+        return hotKeywordRepository.findTopKeywords();
     }
 
     @Transactional(readOnly = true)
     @Cacheable(value = "searchMovie", key = "'v2genre'", sync = true)
     public List<GenreKeywordResponse> v2topGenre() {
         log.info("[CACHE_MISS] v2topGenre -> genre (DB hit)");
-        return searchRepository.findTopGenres();
+        return hotKeywordRepository.findTopGenres();
     }
 
     @Transactional(readOnly = true)
@@ -92,7 +92,7 @@ public class SearchService {
         LocalDateTime from = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime to = yearMonth.plusMonths(1).atDay(1).atStartOfDay();
 
-        List<PeriodKeywordResponse> periodKeywords = searchRepository.findTopPeriod(from, to);
+        List<PeriodKeywordResponse> periodKeywords = hotKeywordRepository.findTopPeriod(from, to);
         return new PeriodSearchResponse(yearMonth.toString(), periodKeywords);
     }
 
@@ -102,34 +102,34 @@ public class SearchService {
 
     @Transactional(readOnly = true)
     public List<HotKeywordResponse> v3topSynthesis() {
-        List<HotKeywordResponse> cached = searchCacheService.getSynthesis();
+        List<HotKeywordResponse> cached = hotKeywordCacheService.getSynthesis();
         if (cached != null) {
             return cached;
         }
 
         log.info("[CACHE_MISS] v3topSynthesis -> DB hit");
-        List<HotKeywordResponse> topKeywords = searchRepository.findTopKeywords();
-        searchCacheService.saveSynthesis(topKeywords);
+        List<HotKeywordResponse> topKeywords = hotKeywordRepository.findTopKeywords();
+        hotKeywordCacheService.saveSynthesis(topKeywords);
         return topKeywords;
     }
 
     @Transactional(readOnly = true)
     public List<GenreKeywordResponse> v3topGenre() {
-        List<GenreKeywordResponse> cached = searchCacheService.getGenre();
+        List<GenreKeywordResponse> cached = hotKeywordCacheService.getGenre();
         if (cached != null) {
             return cached;
         }
 
         log.info("[CACHE_MISS] v3topGenre -> DB hit");
-        List<GenreKeywordResponse> topGenres = searchRepository.findTopGenres();
-        searchCacheService.saveGenre(topGenres);
+        List<GenreKeywordResponse> topGenres = hotKeywordRepository.findTopGenres();
+        hotKeywordCacheService.saveGenre(topGenres);
         return topGenres;
     }
 
     @Transactional(readOnly = true)
     public PeriodSearchResponse v3topPeriod(PeriodSearchRequest request) {
 
-        PeriodSearchResponse period = searchCacheService.getPeriod(request.getYear(), request.getMonth());
+        PeriodSearchResponse period = hotKeywordCacheService.getPeriod(request.getYear(), request.getMonth());
         if (period != null) {
             return period;
         }
@@ -139,10 +139,10 @@ public class SearchService {
         LocalDateTime from = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime to = yearMonth.plusMonths(1).atDay(1).atStartOfDay();
 
-        List<PeriodKeywordResponse> periodKeywords = searchRepository.findTopPeriod(from, to);
+        List<PeriodKeywordResponse> periodKeywords = hotKeywordRepository.findTopPeriod(from, to);
         PeriodSearchResponse response = new PeriodSearchResponse(yearMonth.toString(), periodKeywords);
 
-        searchCacheService.savePeriod(request.getYear(), request.getMonth(), response);
+        hotKeywordCacheService.savePeriod(request.getYear(), request.getMonth(), response);
 
         return response;
     }
