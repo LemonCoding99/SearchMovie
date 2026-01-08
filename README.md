@@ -13,14 +13,14 @@
 - **Language**: Java 17
 - **Build Tool**: Gradle
 - **Version Control**: Git, GitHub
-- **Test Tool**: Postman, NGrinder, 
+- **Test Tool**: Postman, NGrinder, JUnit
 
 ## 🛠️ 기술 스택
 
 - **Language**: Java
 - **Framework**: Spring Boot 3
 - **ORM**: Spring Data JPA, Hibernate
-- **Database**: MySQL 8, redis
+- **Database**: MySQL, redis
 - **Security:** Spring Security
 - **Validation:** Bean Validation
 
