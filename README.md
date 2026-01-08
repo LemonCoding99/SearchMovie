@@ -350,7 +350,7 @@ C:.
     - `coupon_inventories`: 쿠폰 재고
     - `coupons`: 쿠폰
     - `genres`: 장르
-    - `issued_coupon_histories`: 팀 멤버
+    - `issued_coupon_histories`: 발급 쿠폰 기록
     - `movie_genres`: 영화 장르(영화와 장르 연결)
     - `movies`: 영화
     - `reviews`: 리뷰
