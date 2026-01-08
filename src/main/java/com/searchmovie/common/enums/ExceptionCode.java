@@ -60,12 +60,10 @@ public enum ExceptionCode {
     INVALID_COUPON_USE_POLICY(HttpStatus.BAD_REQUEST, "쿠폰 사용기간 정책이 올바르지 않습니다."),
     INVALID_COUPON_DISCOUNT(HttpStatus.BAD_REQUEST, "쿠폰 할인 정책이 올바르지 않습니다."),
 
-
-
     // couponStock
     COUPONSTOCK_NOT_FOUND(HttpStatus.NO_CONTENT, "존재하지 않는 쿠폰이거나 쿠폰 재고 정보가 없습니다."),
-    ALREADY_EXISTS_COUPONSTOCK(HttpStatus.CONFLICT, "이미 존재하는 쿠폰 재고입니다.");
-
+    ALREADY_EXISTS_COUPONSTOCK(HttpStatus.CONFLICT, "이미 존재하는 쿠폰 재고입니다."),
+    COUPON_SOLD_OUT(HttpStatus.BAD_REQUEST, "쿠폰이 모두 소진되었습니다.");
 
     private final HttpStatus status;
     private final String message;

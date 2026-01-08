@@ -17,6 +17,8 @@ import com.searchmovie.domain.coupon.repository.CouponRepository;
 import com.searchmovie.domain.coupon.repository.IssuedCouponHistoryRepository;
 import com.searchmovie.domain.couponStock.entity.CouponStock;
 import com.searchmovie.domain.couponStock.repository.CouponStockRepository;
+import com.searchmovie.domain.couponStock.service.CouponCoreService;
+import com.searchmovie.domain.couponStock.service.CouponStockService;
 import com.searchmovie.domain.user.entity.User;
 import com.searchmovie.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ public class CouponService {
     private final IssuedCouponHistoryRepository issuedCouponHistoryRepository;
     private final CouponStockRepository couponStockRepository;
     private final UserRepository userRepository;
+    private final CouponStockService couponStockService;
 
     @Transactional
     public IssuedCouponHistoryIssueResponse issueMyCoupon(Long userId, Long couponId) {
@@ -68,7 +71,8 @@ public class CouponService {
         if (stock.getPresentQuantity() <= 0) {
             throw new CustomException(ExceptionCode.COUPON_OUT_OF_STOCK);
         }
-        stock.decrease(1);
+
+        couponStockService.decreaseStock(couponId, 1); // 낙관적 락 적용하면서 바뀐 부분
 
         // 만료일 계산
         LocalDateTime issuedAt = now;

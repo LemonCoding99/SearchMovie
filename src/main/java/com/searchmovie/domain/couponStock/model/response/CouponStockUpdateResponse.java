@@ -11,16 +11,14 @@ public class CouponStockUpdateResponse {
     private final long couponId;
     private final int totalQuantity;
     private final int presentQuantity;
-    private final long version;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public CouponStockUpdateResponse(long id, long couponId, int totalQuantity, int presentQuantity, long version, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CouponStockUpdateResponse(long id, long couponId, int totalQuantity, int presentQuantity, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.couponId = couponId;
         this.totalQuantity = totalQuantity;
         this.presentQuantity = presentQuantity;
-        this.version = version;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -31,7 +29,6 @@ public class CouponStockUpdateResponse {
                 couponStock.getCouponId(),
                 couponStock.getTotalQuantity(),
                 couponStock.getPresentQuantity(),
-                couponStock.getVersion(),
                 couponStock.getCreatedAt(),
                 couponStock.getUpdatedAt()
         );

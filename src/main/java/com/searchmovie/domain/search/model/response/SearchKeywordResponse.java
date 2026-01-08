@@ -14,4 +14,6 @@ public class SearchKeywordResponse {
     private final String director;
     private final LocalDate releaseDate;
     private final Long score;
+
+
 }

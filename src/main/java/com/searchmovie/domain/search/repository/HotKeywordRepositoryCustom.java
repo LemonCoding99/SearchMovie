@@ -7,7 +7,7 @@ import com.searchmovie.domain.search.model.response.PeriodKeywordResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface SearchLogRepositoryCustom {
+public interface HotKeywordRepositoryCustom {
 
     List<HotKeywordResponse> findTopKeywords();
     List<GenreKeywordResponse> findTopGenres();
