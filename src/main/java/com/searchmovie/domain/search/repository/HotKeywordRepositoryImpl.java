@@ -12,19 +12,19 @@ import java.util.stream.IntStream;
 import static com.searchmovie.domain.movie.entity.QGenre.genre;
 import static com.searchmovie.domain.movie.entity.QMovie.movie;
 import static com.searchmovie.domain.movie.entity.QMovieGenre.movieGenre;
-import static com.searchmovie.domain.search.entity.QSearchLog.searchLog;
+import static com.searchmovie.domain.search.entity.QHotKeyword.hotKeyword;
 
 @RequiredArgsConstructor
-public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
+public class HotKeywordRepositoryImpl implements HotKeywordRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
     //월간 인기검색 조건용
     private BooleanExpression searchedBetween(LocalDateTime from, LocalDateTime to) {
         if (from == null && to == null) return null;
-        if (from == null) return searchLog.searchedAt.lt(to);
-        if (to == null) return searchLog.searchedAt.goe(from);
-        return searchLog.searchedAt.goe(from).and(searchLog.searchedAt.lt(to));
+        if (from == null) return hotKeyword.searchedAt.lt(to);
+        if (to == null) return hotKeyword.searchedAt.goe(from);
+        return hotKeyword.searchedAt.goe(from).and(hotKeyword.searchedAt.lt(to));
     }
 
 
@@ -34,25 +34,25 @@ public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
     @Override
     public List<HotKeywordResponse> findTopKeywords() {
 
-        NumberExpression<Long> score = searchLog.id.count();
+        NumberExpression<Long> score = hotKeyword.id.count();
 
         List<SearchKeywordResponse> rows = queryFactory
                 .select(Projections.constructor(
                         SearchKeywordResponse.class,
-                        searchLog.keyword,
+                        hotKeyword.keyword,
                         movie.title,
                         genre.name,
                         movie.director,
                         movie.releaseDate,
                         score
                 ))
-                .from(searchLog)
-                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
+                .from(hotKeyword)
+                .leftJoin(movie).on(movie.id.eq(hotKeyword.movieId))
                 .leftJoin(movieGenre).on(movieGenre.movieId.eq(movie.id))
                 .leftJoin(genre).on(genre.id.eq(movieGenre.genreId))
-                .where(searchLog.keyword.isNotNull(),
-                        searchLog.keyword.ne(""))
-                .groupBy(searchLog.keyword,
+                .where(hotKeyword.keyword.isNotNull(),
+                        hotKeyword.keyword.ne(""))
+                .groupBy(hotKeyword.keyword,
                         movie.title,
                         genre.name,
                         movie.director,
@@ -75,13 +75,13 @@ public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
     }
 
 
-    /**
-     * 장르별 인기검색어 TOP 10
-     */
+            /**
+             * 장르별 인기검색어 TOP 10
+             */
     @Override
     public List<GenreKeywordResponse> findTopGenres() {
 
-        NumberExpression<Long> score = searchLog.id.count();
+        NumberExpression<Long> score = hotKeyword.id.count();
 
         List<SearchGenresResponse> rows = queryFactory
                 .select(Projections.constructor(
@@ -89,8 +89,8 @@ public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
                         genre.name,
                         score
                 ))
-                .from(searchLog)
-                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
+                .from(hotKeyword)
+                .leftJoin(movie).on(movie.id.eq(hotKeyword.movieId))
                 .leftJoin(movieGenre).on(movieGenre.movieId.eq(movie.id))
                 .leftJoin(genre).on(genre.id.eq(movieGenre.genreId))
                 .groupBy(genre.name)
@@ -108,33 +108,33 @@ public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
     }
 
 
-    /**
-     * 월간 인기검색어 TOP 10
-     */
+            /**
+             * 월간 인기검색어 TOP 10
+             */
     @Override
     public List<PeriodKeywordResponse> findTopPeriod(LocalDateTime from, LocalDateTime to) {
 
-        NumberExpression<Long> score = searchLog.id.count();
+        NumberExpression<Long> score = hotKeyword.id.count();
 
         List<SearchPeriodResponse> rows = queryFactory
                 .select(Projections.constructor(
                         SearchPeriodResponse.class,
-                        searchLog.keyword,
+                        hotKeyword.keyword,
                         movie.title,
                         genre.name,
                         movie.director,
                         movie.releaseDate,
                         score
                 ))
-                .from(searchLog)
-                .leftJoin(movie).on(movie.id.eq(searchLog.movieId))
+                .from(hotKeyword)
+                .leftJoin(movie).on(movie.id.eq(hotKeyword.movieId))
                 .leftJoin(movieGenre).on(movieGenre.movieId.eq(movie.id))
                 .leftJoin(genre).on(genre.id.eq(movieGenre.genreId))
-                .where(searchLog.keyword.isNotNull(),
-                        searchLog.keyword.ne(""),
+                .where(hotKeyword.keyword.isNotNull(),
+                        hotKeyword.keyword.ne(""),
                         searchedBetween(from, to)
                 )
-                .groupBy(searchLog.keyword,
+                .groupBy(hotKeyword.keyword,
                         movie.title,
                         genre.name,
                         movie.director,
@@ -158,4 +158,3 @@ public class SearchRepositoryImpl implements SearchLogRepositoryCustom {
     }
 
 }
-
