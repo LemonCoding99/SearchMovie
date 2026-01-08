@@ -8,7 +8,7 @@
 
 ## 🌏 개발 환경
 
-- **OS**: Windows 11
+- **OS**: Mac OS
 - **IDE**: IntelliJ IDEA
 - **Language**: Java 17
 - **Build Tool**: Gradle
