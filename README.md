@@ -2,7 +2,6 @@
 
 ## 🧾 프로젝트 소개
 
-- 영화 쿠폰 발급 및 영화 조회 시스템
 - 영화와 영화 쿠폰 관리  REST API 기반의 안정적인 백엔드 서버 구축
 - 프로젝트 기간: 2025.12.31 ~ 2025.01.09
 
@@ -389,15 +388,30 @@ C:.
 - 로그인 
 - 비밀번호 검증
 
+## 💫 와이어프레임과 ERD 설계 및 API 명세서
 
+- 와이어프레임
+  <img width="1021" height="787" alt="image" src="https://github.com/user-attachments/assets/39885338-8abe-428c-bb0c-619450ff86ef" />
 ## 🧾 트러블 슈팅
 - 쿠폰 재고를 검증할 때 쿠폰 서비스와 재고 서비스 양 쪽에서 검증을 시행하여 동시성 이슈가 발생
   - 재고 차감의 책임이 쿠폰 서비스와 재고 서비스에 분산된 것이 문제
   -> 재고 차감의 책임을 쿠폰 서비스에서만 지도록 재고 서비스에서 수행하던 검증 로직을 삭제
 
 
+- ERD 설계
+<img width="2048" height="797" alt="image" src="https://github.com/user-attachments/assets/16f3ac50-a1a5-44fd-b0f2-ab949acf05af" />
 
 
+- 주요 테이블
+    - `coupon_inventories`: 쿠폰 재고
+    - `coupons`: 쿠폰
+    - `genres`: 장르
+    - `issued_coupon_histories`: 발급 쿠폰 기록
+    - `movie_genres`: 영화 장르(영화와 장르 연결)
+    - `movies`: 영화
+    - `reviews`: 리뷰
+    - `search_logs`: 검색 기록
+    - `users`: 회원
 
 ## 🧾 협업 방식 및 규칙
 
@@ -408,3 +422,4 @@ C:.
 | 오은지 | 팀원     | 리뷰 CRUD, 쿠폰 CRUD                                                        | [🍁 깃헙링크] https://github.com/oezy-coder     |
 | 정순관 | 팀원     | 영화 CRUD, 쿠폰 정책 CRUD, 더미 데이터 추출 및 생성                           | [🍁 깃헙링크] https://github.com/uhk561         |
 | 정하륜 | 팀원     | 영화 인기 검색 차트 API, 쿠폰 발급 동시성 (비관적)락 부여                      | [🍁 깃헙링크] https://github.com/jyop1212hy     |
+- API 상세설명 : https://www.notion.so/teamsparta/2cb2dc3ef51481b28cb6feb491c41c44?v=2cb2dc3ef514815cbd0a000c37ebb10a&source=copy_link
