@@ -394,8 +394,6 @@ C:.
 - 쿠폰 재고를 검증할 때 쿠폰 서비스와 재고 서비스 양 쪽에서 검증을 시행하여 동시성 이슈가 발생
   - 재고 차감의 책임이 쿠폰 서비스와 재고 서비스에 분산된 것이 문제
   -> 재고 차감의 책임을 쿠폰 서비스에서만 지도록 재고 서비스에서 수행하던 검증 로직을 삭제
-<img width="1131" height="649" alt="image" src="https://github.com/user-attachments/assets/f22303d8-6366-44a6-9f5f-a4e28503fdb1" />
-<img width="1138" height="635" alt="image" src="https://github.com/user-attachments/assets/860d73cb-7f85-47af-8e29-bafcb30bd005" />
 
 
 
