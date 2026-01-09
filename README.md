@@ -2,9 +2,16 @@
 
 ## 🧾 프로젝트 소개
 
-- 영화 쿠폰 발급 및 영화 조회 사이트 시스템
+- 영화 쿠폰 발급 및 영화 조회 시스템
 - 영화와 영화 쿠폰 관리  REST API 기반의 안정적인 백엔드 서버 구축
 - 프로젝트 기간: 2025.12.31 ~ 2025.01.09
+
+## 🧾 프로젝트 목표
+- 쿠폰 발급 과정에서 발생할 수 있는 동시성 문제를 해결
+- 대규모 트래픽 대응
+  - Redis 활용
+  - 영화 더미데이터 10만건 이상 테스트
+- 캐싱을 활용한 응답 속도 향상
 
 ## 🌏 개발 환경
 
@@ -23,6 +30,52 @@
 - **Database**: MySQL, redis
 - **Security:** Spring Security
 - **Validation:** Bean Validation
+
+## 기술 스택 사용 이유
+- **Redis**
+    - 사용하고 있는 프레임워크인 스프링과의 호환성이 좋고 캐시 읽기가 가능하여 db의 성능유지를 서포팅할 수 있어 채용함
+    - redis에서는 값을 문자열로밖에 못 받아오기에 값을 문자열로 저장하는 자료구조인 Redis template을 활용
+- **MySQL**
+    - 여러 엔티티와 연관관계를 맺고 있는 시스템 특성상 관계형 데이터베이스를 채용
+    - 
+- 1) Remote Cache 를 위한 다양한 라이브러리(Memcached 등) 들이 있을텐데 그 중에서 Redis 를 선택한 이유가 무엇일까?
+  2) Redis Cache 에 데이터를 저장할 때 사용한 자료구조는 무엇이고, 다양한 자료구조중에 해당 자료구조를 선택한 이유는 무엇일까?
+  3) RDBMS(SQL) 와 NoSQL 의 차이점은 무엇일까?
+  
+
+## 주요 구현 기능
+- 10만건 이상의 데이터 관리 
+- 대용량 트래픽 대응 기능 구현
+  - index, redis, query dsl 적용으로 트래픽 처리량 40배 증가 효과
+  - Optimistic Lock 적용으로 동시성 문제 해결
+ 
+
+## 💫 와이어프레임과 ERD 설계 및 API 명세서
+
+- 와이어프레임
+  <img width="1021" height="787" alt="image" src="https://github.com/user-attachments/assets/39885338-8abe-428c-bb0c-619450ff86ef" />
+
+
+- ERD 설계
+<img width="2048" height="797" alt="image" src="https://github.com/user-attachments/assets/16f3ac50-a1a5-44fd-b0f2-ab949acf05af" />
+
+
+- 주요 테이블
+    - `coupon_inventories`: 쿠폰 재고
+    - `coupons`: 쿠폰
+    - `genres`: 장르
+    - `issued_coupon_histories`: 발급 쿠폰 기록
+    - `movie_genres`: 영화 장르(영화와 장르 연결)
+    - `movies`: 영화
+    - `reviews`: 리뷰
+    - `search_logs`: 검색 기록
+    - `users`: 회원
+
+
+- API 상세설명 : https://www.notion.so/teamsparta/2cb2dc3ef51481b28cb6feb491c41c44?v=2cb2dc3ef514815cbd0a000c37ebb10a&source=copy_link
+
+
+
 
 ## 🧩 프로젝트 구조
 ```
@@ -336,26 +389,24 @@ C:.
 - 로그인 
 - 비밀번호 검증
 
-## 💫 와이어프레임과 ERD 설계 및 API 명세서
 
-- 와이어프레임
-  <img width="1021" height="787" alt="image" src="https://github.com/user-attachments/assets/39885338-8abe-428c-bb0c-619450ff86ef" />
-
-
-- ERD 설계
-<img width="2048" height="797" alt="image" src="https://github.com/user-attachments/assets/16f3ac50-a1a5-44fd-b0f2-ab949acf05af" />
-
-
-- 주요 테이블
-    - `coupon_inventories`: 쿠폰 재고
-    - `coupons`: 쿠폰
-    - `genres`: 장르
-    - `issued_coupon_histories`: 발급 쿠폰 기록
-    - `movie_genres`: 영화 장르(영화와 장르 연결)
-    - `movies`: 영화
-    - `reviews`: 리뷰
-    - `search_logs`: 검색 기록
-    - `users`: 회원
+## 🧾 트러블 슈팅
+- 쿠폰 재고를 검증할 때 쿠폰 서비스와 재고 서비스 양 쪽에서 검증을 시행하여 동시성 이슈가 발생
+  - 재고 차감의 책임이 쿠폰 서비스와 재고 서비스에 분산된 것이 문제
+  -> 재고 차감의 책임을 쿠폰 서비스에서만 지도록 재고 서비스에서 수행하던 검증 로직을 삭제
+<img width="1131" height="649" alt="image" src="https://github.com/user-attachments/assets/f22303d8-6366-44a6-9f5f-a4e28503fdb1" />
+<img width="1138" height="635" alt="image" src="https://github.com/user-attachments/assets/860d73cb-7f85-47af-8e29-bafcb30bd005" />
 
 
-- API 상세설명 : https://www.notion.so/teamsparta/2cb2dc3ef51481b28cb6feb491c41c44?v=2cb2dc3ef514815cbd0a000c37ebb10a&source=copy_link
+
+
+
+## 🧾 협업 방식 및 규칙
+
+| 이름   | 포지션   | 담당(개인별 기여점)                                                                                                         | Github 링크                       |
+|--------|----------|-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
+| 백은서 | 리더     | 영화 전체 검색 API, 영화 키워드 검색 로그 API, 쿠폰 발급 동시성 (낙관적)락 부여 | [🍁 깃헙링크] https://github.com/LemonCoding99  |
+| 김진찬 | 팀원     | JWT 기반 인증/인가, 유저 CRUD, 쿠폰 재고 CRUD                                | [🍁 깃헙링크] https://github.com/shortring      |
+| 오은지 | 팀원     | 리뷰 CRUD, 쿠폰 CRUD                                                        | [🍁 깃헙링크] https://github.com/oezy-coder     |
+| 정순관 | 팀원     | 영화 CRUD, 쿠폰 정책 CRUD, 더미 데이터 추출 및 생성                           | [🍁 깃헙링크] https://github.com/uhk561         |
+| 정하륜 | 팀원     | 영화 인기 검색 차트 API, 쿠폰 발급 동시성 (비관적)락 부여                      | [🍁 깃헙링크] https://github.com/jyop1212hy     |
