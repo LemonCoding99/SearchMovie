@@ -45,11 +45,11 @@ public class CouponService {
         validateIssueStartAtAndIssueEndAt(foundCoupon);
         validateDuplicateIssue(userId, couponId);
 
-        // 쿠폰 수량 차감
-        couponStockService.decreaseStock(couponId, 1);
-
         LocalDateTime issuedAt = LocalDateTime.now();
         LocalDateTime expiredAt = calculateExpiredAt(foundCoupon, issuedAt);
+
+        // 쿠폰 수량 차감
+        couponStockService.decreaseStock(couponId, 1);
 
         IssuedCouponHistory history = new IssuedCouponHistory(foundUser, foundCoupon, issuedAt, expiredAt);
         IssuedCouponHistory saved = issuedCouponHistoryRepository.save(history);
@@ -199,21 +199,13 @@ public class CouponService {
     private LocalDateTime calculateExpiredAt(Coupon coupon, LocalDateTime issuedAt) {
 
         Integer periodDays = coupon.getUsePeriodDays();
-        LocalDateTime useStartAt = coupon.getUseStartAt();
-        LocalDateTime useEndAt = coupon.getUseEndAt();
 
-        // 발급 후 N일(상대 기간)
         if (periodDays != null) {
-            // 고정 기간 값이 같이 있으면 정책 오류
-            if (useStartAt != null || useEndAt != null) {
-                throw new CustomException(ExceptionCode.COUPON_POLICY_INVALID);
-            }
             return issuedAt.plusDays(periodDays);
         }
-
-        // 고정 기간: start/end 둘 다 있어야 함
-        if (useStartAt == null && useEndAt == null) {
-            throw new CustomException(ExceptionCode.COUPON_POLICY_INVALID);
+        LocalDateTime useEndAt = coupon.getUseEndAt();
+        if (useEndAt == null) {
+            throw new CustomException(ExceptionCode.INVALID_COUPON_USE_POLICY);
         }
         return useEndAt;
     }
