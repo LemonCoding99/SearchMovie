@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
@@ -32,17 +33,21 @@ class UserServiceTest {
     @Mock
     UserRepository userRepository;
 
+    @Mock
+    PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private UserService userService;
 
     private User testUser;
     private User testAdminUser;
+    private String encodedPassword = "{bcrypt}$2b$12$mvnmEHGcl2KqJg/8udGbjek/katAUSctc5gxuMpBL6105tkrCrwHG";
 
     @BeforeEach
     void setup() {
         // raw password = Password123!
-        testUser = new User("testname", "testUserName", "{bcrypt}$2b$12$mvnmEHGcl2KqJg/8udGbjek/katAUSctc5gxuMpBL6105tkrCrwHG", "test@example.com");
-        testAdminUser = new User("adminTestname", "testAdminName", "{bcrypt}$2b$12$mvnmEHGcl2KqJg/8udGbjek/katAUSctc5gxuMpBL6105tkrCrwHG", "adminTest@example.com");
+        testUser = new User("testname", "testUserName", encodedPassword, "test@example.com");
+        testAdminUser = new User("adminTestname", "testAdminName", encodedPassword, "adminTest@example.com");
 
         ReflectionTestUtils.setField(testUser, "id", 1L);
         ReflectionTestUtils.setField(testAdminUser, "id", 2L);
@@ -55,10 +60,11 @@ class UserServiceTest {
         UserCreateRequest request = mock(UserCreateRequest.class);
         when(request.getName()).thenReturn("test name");
         when(request.getUsername()).thenReturn("test username");
-        when(request.getPassword()).thenReturn("testPassword123!");
+        when(request.getPassword()).thenReturn("Password123!");
         when(request.getEmail()).thenReturn("email@test.com");
+        when(passwordEncoder.encode(any())).thenReturn(encodedPassword);
 
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
 
         // when
         UserCreateResponse response = userService.signup(request);
