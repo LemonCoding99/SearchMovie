@@ -43,17 +43,12 @@ public class SecurityConfig {
                                 .requestMatchers("/actuator/health").permitAll()
                                 .requestMatchers("/api/stocks/**").permitAll()
                                 // User 권한만 허용
-//                        .requestMatchers("/api/users/**").hasAuthority(UserRole.Authority.USER)
-//                        .requestMatchers("/api/coupons/*/issue/**").hasAuthority(UserRole.Authority.USER)
-//                        .requestMatchers(HttpMethod.GET, "/api/coupons/**").hasAuthority(UserRole.Authority.USER)
+
                                 // ADMIN 권한만 허용
                                 .requestMatchers(HttpMethod.PUT, "/api/movies/**").hasAuthority(UserRole.Authority.ADMIN)
                                 .requestMatchers(HttpMethod.DELETE, "/api/movies/**").hasAuthority(UserRole.Authority.ADMIN)
                                 .requestMatchers("/api/coupons/*/stocks").hasAuthority(UserRole.Authority.ADMIN)
                                 .requestMatchers("/api/stocks/**").hasAuthority(UserRole.Authority.ADMIN)
-//                        .requestMatchers("/api/users/**").hasAuthority(UserRole.Authority.ADMIN)
-//                        .requestMatchers("/api/coupons/*/issue/**").hasAuthority(UserRole.Authority.ADMIN)
-//                        .requestMatchers(HttpMethod.GET, "/api/coupons/**").hasAuthority(UserRole.Authority.ADMIN)
                                 .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
 
                                 .anyRequest().authenticated()
